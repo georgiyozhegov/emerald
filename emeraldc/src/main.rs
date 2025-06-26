@@ -32,7 +32,7 @@ impl Iterator for Lexer {
 
 impl Lexer {
     fn lex_token(&mut self) -> Option<TokenKind> {
-        let next = self.buffer.iter.peek()?;
+        let next = self.buffer.peek()?;
         match next {
             '0'..'9' => self.lex_integer(),
             'a'..'z' | 'A'..'Z' => self.lex_name_or_keyword(),
@@ -58,7 +58,7 @@ impl Lexer {
     }
 
     fn lex_punctuation(&mut self) -> Option<TokenKind> {
-        let first = self.buffer.iter.next()?;
+        let first = self.buffer.next()?;
         let token = match first {
             '=' => TokenKind::Equal,
             '(' => TokenKind::OpenRound,
@@ -72,7 +72,7 @@ impl Lexer {
 
     fn take_while(&mut self, predicate: impl Fn(char) -> bool) -> String {
         let mut buffer = String::new();
-        while let Some(c) = self.buffer.iter.next_if(|c: &char| predicate(*c)) {
+        while let Some(c) = self.buffer.next_if(&predicate) {
             buffer.push(c);
         }
         buffer
@@ -99,7 +99,7 @@ pub enum TokenKind {
 
 #[derive(Debug)]
 struct SourceBuffer {
-    pub iter: Peekable<std::vec::IntoIter<char>>,
+    iter: Peekable<std::vec::IntoIter<char>>,
     pub cursor: usize,
 }
 
@@ -109,5 +109,21 @@ impl SourceBuffer {
             iter: iter.peekable(),
             cursor: 0,
         }
+    }
+
+    pub fn next(&mut self) -> Option<char> {
+        let c = self.iter.next()?;
+        self.cursor += 1;
+        Some(c)
+    }
+
+    pub fn peek(&mut self) -> Option<char> {
+        self.iter.peek().cloned()
+    }
+
+    pub fn next_if(&mut self, predicate: impl Fn(char) -> bool) -> Option<char> {
+        let c = self.iter.next_if(|c: &char| predicate(*c))?;
+        self.cursor += 1;
+        Some(c)
     }
 }
