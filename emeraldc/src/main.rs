@@ -35,7 +35,7 @@ impl Lexer {
         let next = self.buffer.peek()?;
         match next {
             '0'..'9' => self.lex_integer(),
-            'a'..'z' | 'A'..'Z' => self.lex_name_or_keyword(),
+            'a'..'z' | 'A'..'Z' | '_' => self.lex_name_or_keyword(),
             _ => self.lex_punctuation(),
         }
     }
@@ -47,7 +47,7 @@ impl Lexer {
     }
 
     fn lex_name_or_keyword(&mut self) -> Option<TokenKind> {
-        let text = self.take_while(|c| matches!(c, 'a'..'z' | 'A'..'Z' | '0'..'9' | '_'));
+        let text = self.take_while(|c| matches!(c, 'a'..'z' | 'A'..'Z' | '_' | '0'..'9'));
         let token = match text.as_str() {
             "function" => TokenKind::Function,
             "end" => TokenKind::End,
