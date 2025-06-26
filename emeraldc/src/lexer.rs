@@ -72,7 +72,7 @@ impl Lexer {
 }
 
 #[non_exhaustive]
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum TokenKind {
     // literals
     Integer(i128),

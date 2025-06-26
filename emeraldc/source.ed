@@ -1,3 +1,8 @@
+function add()
+    let b = 2
+    let c = 3
+end
+
 function main()
     let a = 1
 end
