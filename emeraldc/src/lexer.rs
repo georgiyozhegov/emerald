@@ -57,6 +57,13 @@ impl Lexer {
             ')' => TokenKind::CloseRound,
             '{' => TokenKind::OpenCurly,
             '}' => TokenKind::CloseCurly,
+            '+' => TokenKind::Plus,
+            '-' => TokenKind::Minus,
+            '*' => TokenKind::Star,
+            '/' => TokenKind::Slash,
+            '?' => TokenKind::Question,
+            '>' => TokenKind::RightAngle,
+            '<' => TokenKind::LeftAngle,
             _ => todo!("error handling"),
         };
         Some(token)
@@ -81,12 +88,20 @@ pub enum TokenKind {
     Function,
     End,
     Let,
-    // pucntuation
+    // punctuation
     Equal,
     OpenRound,
     CloseRound,
     OpenCurly,
     CloseCurly,
+    // operators
+    Plus,
+    Minus,
+    Star,
+    Slash,
+    Question,
+    RightAngle,
+    LeftAngle,
 }
 
 #[derive(Debug)]

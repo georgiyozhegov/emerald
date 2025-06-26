@@ -11,4 +11,5 @@ fn main() {
         let node = &ast[declaration];
         println!("{node:?}");
     }
+    println!("{ast:?}");
 }
