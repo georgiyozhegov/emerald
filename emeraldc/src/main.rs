@@ -6,7 +6,7 @@ fn main() {
     let iter = source.chars().collect::<Vec<_>>().into_iter();
     let lexer = lexer::Lexer::new(iter);
     let parser = parser::Parser::new(lexer);
-    let (program, ast) = parser.parse();
+    let (program, ast) = parser.parse().unwrap();
     for declaration in program {
         let node = &ast[declaration];
         println!("{node:?}");

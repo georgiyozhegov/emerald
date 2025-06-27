@@ -34,7 +34,9 @@ impl Lexer {
 
     fn lex_integer(&mut self) -> Result<TokenKind, LexerError> {
         let text = self.take_while(|c| matches!(c, '0'..'9' | '_'));
-        let value = text.parse::<i128>().map_err(|_| LexerError::IntegerTooLarge)?;
+        let value = text
+            .parse::<i128>()
+            .map_err(|_| LexerError::IntegerTooLarge)?;
         Ok(TokenKind::Integer(value))
     }
 
@@ -81,7 +83,7 @@ impl Lexer {
 }
 
 #[non_exhaustive]
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum TokenKind {
     // literals
     Integer(i128),
@@ -137,6 +139,7 @@ impl SourceBuffer {
     }
 }
 
+#[derive(Debug, Clone)]
 pub enum LexerError {
     UnknownCharacter(char),
     IntegerTooLarge,
