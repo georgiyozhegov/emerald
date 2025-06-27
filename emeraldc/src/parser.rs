@@ -1,4 +1,4 @@
-use std::{fmt::Debug, iter::Peekable, ops::Index};
+use std::{fmt::{self, Debug}, iter::Peekable, ops::Index};
 
 use crate::lexer::{Lexer, LexerError, TokenKind};
 
@@ -243,6 +243,16 @@ impl ParserError {
         Self::UnexpectedToken {
             expected: expected.to_string(),
             got,
+        }
+    }
+}
+
+impl fmt::Display for ParserError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Lexer(error) => write!(f, "{error}"),
+            Self::UnexpectedToken { expected, got } => write!(f, "expected {expected}, got {got:?}"),
+            Self::UnexpectedEof => write!(f, "unexpected end of file"),
         }
     }
 }

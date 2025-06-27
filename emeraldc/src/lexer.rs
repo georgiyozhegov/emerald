@@ -1,5 +1,6 @@
 use std::iter::Peekable;
 use std::vec;
+use std::fmt;
 
 #[derive(Debug)]
 pub struct Lexer {
@@ -143,4 +144,13 @@ impl SourceBuffer {
 pub enum LexerError {
     UnknownCharacter(char),
     IntegerTooLarge,
+}
+
+impl fmt::Display for LexerError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::UnknownCharacter(c) => write!(f, "unknown character '{c}'"),
+            Self::IntegerTooLarge => write!(f, "integer is too large"),
+        }
+    }
 }
