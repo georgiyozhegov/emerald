@@ -109,6 +109,30 @@ pub enum TokenKind {
     LeftAngle,
 }
 
+impl fmt::Display for TokenKind {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Integer(value) => write!(f, "{value}"),
+            Self::Name(name) => write!(f, "{name}"),
+            Self::Function => write!(f, "function"),
+            Self::End => write!(f, "end"),
+            Self::Let => write!(f, "let"),
+            Self::Equal => write!(f, "="),
+            Self::OpenRound => write!(f, "("),
+            Self::CloseRound => write!(f, ")"),
+            Self::OpenCurly => write!(f, "{{"),
+            Self::CloseCurly => write!(f, "}}"),
+            Self::Plus => write!(f, "+"),
+            Self::Minus => write!(f, "-"),
+            Self::Star => write!(f, "*"),
+            Self::Slash => write!(f, "/"),
+            Self::Question => write!(f, "/"),
+            Self::RightAngle => write!(f, ">"),
+            Self::LeftAngle => write!(f, "<"),
+        }
+    }
+}
+
 #[derive(Debug)]
 struct SourceBuffer {
     iter: Peekable<vec::IntoIter<char>>,
