@@ -14,7 +14,7 @@ impl Lexer {
 }
 
 impl Iterator for Lexer {
-    type Item = TokenKind;
+    type Item = Result<TokenKind, LexerError>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.take_while(|c| matches!(c, ' ' | '\n'));
@@ -23,22 +23,22 @@ impl Iterator for Lexer {
 }
 
 impl Lexer {
-    fn lex_token(&mut self) -> Option<TokenKind> {
+    fn lex_token(&mut self) -> Option<Result<TokenKind, LexerError>> {
         let next = self.buffer.peek()?;
         match next {
-            '0'..'9' => self.lex_integer(),
-            'a'..'z' | 'A'..'Z' | '_' => self.lex_name_or_keyword(),
+            '0'..'9' => Some(self.lex_integer()),
+            'a'..'z' | 'A'..'Z' | '_' => Some(Ok(self.lex_name_or_keyword())),
             _ => self.lex_punctuation(),
         }
     }
 
-    fn lex_integer(&mut self) -> Option<TokenKind> {
+    fn lex_integer(&mut self) -> Result<TokenKind, LexerError> {
         let text = self.take_while(|c| matches!(c, '0'..'9' | '_'));
-        let value = text.parse::<i128>().unwrap();
-        Some(TokenKind::Integer(value))
+        let value = text.parse::<i128>().map_err(|_| LexerError::IntegerTooLarge)?;
+        Ok(TokenKind::Integer(value))
     }
 
-    fn lex_name_or_keyword(&mut self) -> Option<TokenKind> {
+    fn lex_name_or_keyword(&mut self) -> TokenKind {
         let text = self.take_while(|c| matches!(c, 'a'..'z' | 'A'..'Z' | '_' | '0'..'9'));
         let token = match text.as_str() {
             "function" => TokenKind::Function,
@@ -46,10 +46,10 @@ impl Lexer {
             "let" => TokenKind::Let,
             _ => TokenKind::Name(text),
         };
-        Some(token)
+        token
     }
 
-    fn lex_punctuation(&mut self) -> Option<TokenKind> {
+    fn lex_punctuation(&mut self) -> Option<Result<TokenKind, LexerError>> {
         let first = self.buffer.next()?;
         let token = match first {
             '=' => TokenKind::Equal,
@@ -64,9 +64,11 @@ impl Lexer {
             '?' => TokenKind::Question,
             '>' => TokenKind::RightAngle,
             '<' => TokenKind::LeftAngle,
-            _ => todo!("error handling"),
+            c => {
+                return Some(Err(LexerError::UnknownCharacter(c)));
+            }
         };
-        Some(token)
+        Some(Ok(token))
     }
 
     fn take_while(&mut self, predicate: impl Fn(char) -> bool) -> String {
@@ -133,4 +135,9 @@ impl SourceBuffer {
         self.cursor += 1;
         Some(c)
     }
+}
+
+pub enum LexerError {
+    UnknownCharacter(char),
+    IntegerTooLarge,
 }
