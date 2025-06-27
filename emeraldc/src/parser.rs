@@ -130,19 +130,11 @@ impl<'p> ExpressionParser<'p> {
     }
 
     fn maybe_comparision_operator(&mut self) -> Option<BinaryOperator> {
-        const TOKENS: [TokenKind; 3] = [
-            TokenKind::Question,
-            TokenKind::RightAngle,
-            TokenKind::LeftAngle,
-        ];
-        let token = self.parser.lexer.next_if(|t| TOKENS.contains(t))?;
-        let operator = match token {
-            TokenKind::Question => BinaryOperator::Equal,
-            TokenKind::RightAngle => BinaryOperator::Greater,
-            TokenKind::LeftAngle => BinaryOperator::Less,
-            _ => unreachable!(),
-        };
-        Some(operator)
+        matches!(
+            self.parser.lexer.peek()?,
+            TokenKind::Question | TokenKind::RightAngle | TokenKind::LeftAngle,
+        )
+        .then(|| self.parse_binary_operator())
     }
 
     fn parse_term(&mut self) -> NodeId {
@@ -160,17 +152,11 @@ impl<'p> ExpressionParser<'p> {
     }
 
     fn maybe_term_operator(&mut self) -> Option<BinaryOperator> {
-        const TOKENS: [TokenKind; 2] = [
-            TokenKind::Plus,
-            TokenKind::Minus,
-        ];
-        let token = self.parser.lexer.next_if(|t| TOKENS.contains(t))?;
-        let operator = match token {
-            TokenKind::Plus => BinaryOperator::Add,
-            TokenKind::Minus => BinaryOperator::Subtract,
-            _ => unreachable!(),
-        };
-        Some(operator)
+        matches!(
+            self.parser.lexer.peek()?,
+            TokenKind::Plus | TokenKind::Minus,
+        )
+        .then(|| self.parse_binary_operator())
     }
 
     fn parse_factor(&mut self) -> NodeId {
@@ -188,17 +174,24 @@ impl<'p> ExpressionParser<'p> {
     }
 
     fn maybe_factor_operator(&mut self) -> Option<BinaryOperator> {
-        const TOKENS: [TokenKind; 2] = [
-            TokenKind::Star,
-            TokenKind::Slash,
-        ];
-        let token = self.parser.lexer.next_if(|t| TOKENS.contains(t))?;
-        let operator = match token {
+        matches!(
+            self.parser.lexer.peek()?,
+            TokenKind::Star | TokenKind::Slash,
+        )
+        .then(|| self.parse_binary_operator())
+    }
+
+    fn parse_binary_operator(&mut self) -> BinaryOperator {
+        match self.parser.lexer.next().expect("todo: error handling") {
+            TokenKind::Plus => BinaryOperator::Add,
+            TokenKind::Minus => BinaryOperator::Subtract,
             TokenKind::Star => BinaryOperator::Multiply,
             TokenKind::Slash => BinaryOperator::Divide,
-            _ => unreachable!(),
-        };
-        Some(operator)
+            TokenKind::Question => BinaryOperator::Equal,
+            TokenKind::RightAngle => BinaryOperator::Greater,
+            TokenKind::LeftAngle => BinaryOperator::Less,
+            _ => todo!("error handling"),
+        }
     }
 
     fn parse_unary(&mut self) -> NodeId {
