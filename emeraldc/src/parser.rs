@@ -78,6 +78,7 @@ impl Parser {
             Some(TokenKind::Let) => self.parse_let(),
             Some(TokenKind::Name(..)) => self.parse_assign(),
             Some(TokenKind::If) => self.parse_if(),
+            Some(TokenKind::While) => self.parse_while(),
             Some(got) => {
                 let error = ParserError::unexpected_token("statement", got.clone());
                 Err(error)
@@ -126,6 +127,16 @@ impl Parser {
         let body = self.parse_statement_body()?;
         self.expect(TokenKind::CloseCurly, "'}' after else body")?;
         let node = Node::Else { body };
+        Ok(self.ast.make(node))
+    }
+
+    fn parse_while(&mut self) -> Result<NodeId, ParserError> {
+        self.expect(TokenKind::While, "while")?;
+        let condition = self.parse_expression()?;
+        self.expect(TokenKind::OpenCurly, "'{' after while condition")?;
+        let body = self.parse_statement_body()?;
+        self.expect(TokenKind::CloseCurly, "'}' after while body")?;
+        let node = Node::While { condition, body };
         Ok(self.ast.make(node))
     }
 
@@ -341,6 +352,10 @@ pub enum Node {
         name: NodeId,
         value: NodeId,
     },
+    Assign {
+        name: NodeId,
+        value: NodeId,
+    },
     StatementBody(Vec<NodeId>),
     Else {
         body: NodeId,
@@ -350,9 +365,9 @@ pub enum Node {
         body: NodeId,
         else_: Option<NodeId>,
     },
-    Assign {
-        name: NodeId,
-        value: NodeId,
+    While {
+        condition: NodeId,
+        body: NodeId,
     },
     DeclarationBody(Vec<NodeId>),
     Function {
