@@ -1,6 +1,6 @@
+use std::fmt;
 use std::iter::Peekable;
 use std::vec;
-use std::fmt;
 
 #[derive(Debug)]
 pub struct Lexer {
@@ -48,6 +48,7 @@ impl Lexer {
             "end" => TokenKind::End,
             "let" => TokenKind::Let,
             "if" => TokenKind::If,
+            "else" => TokenKind::Else,
             _ => TokenKind::Name(text),
         };
         token
@@ -95,6 +96,7 @@ pub enum TokenKind {
     End,
     Let,
     If,
+    Else,
     // punctuation
     Equal,
     OpenRound,
@@ -120,6 +122,7 @@ impl fmt::Display for TokenKind {
             Self::End => write!(f, "end"),
             Self::Let => write!(f, "let"),
             Self::If => write!(f, "if"),
+            Self::Else => write!(f, "else"),
             Self::Equal => write!(f, "="),
             Self::OpenRound => write!(f, "("),
             Self::CloseRound => write!(f, ")"),

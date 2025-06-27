@@ -1,6 +1,6 @@
+use std::fmt;
 use std::iter::Peekable;
 use std::ops::Index;
-use std::fmt;
 
 use crate::lexer::{Lexer, LexerError, TokenKind};
 
@@ -106,10 +106,26 @@ impl Parser {
     fn parse_if(&mut self) -> Result<NodeId, ParserError> {
         self.expect(TokenKind::If, "if")?;
         let condition = self.parse_expression()?;
-        self.expect(TokenKind::OpenCurly, "expected '{' after if condition")?;
+        self.expect(TokenKind::OpenCurly, "'{' after if condition")?;
         let body = self.parse_statement_body()?;
-        self.expect(TokenKind::CloseCurly, "expected '}' after if body")?;
-        let node = Node::If { condition, body };
+        self.expect(TokenKind::CloseCurly, "'}' after if body")?;
+        let else_ = self.maybe_else()?;
+        let node = Node::If { condition, body, else_ };
+        Ok(self.ast.make(node))
+    }
+
+    fn maybe_else(&mut self) -> Result<Option<NodeId>, ParserError> {
+        matches!(self.peek_token()?, Some(TokenKind::Else))
+            .then(|| self.parse_else())
+            .transpose()
+    }
+
+    fn parse_else(&mut self) -> Result<NodeId, ParserError> {
+        self.expect(TokenKind::Else, "'else' after if body")?;
+        self.expect(TokenKind::OpenCurly, "'{' after else")?;
+        let body = self.parse_statement_body()?;
+        self.expect(TokenKind::CloseCurly, "'}' after else body")?;
+        let node = Node::Else { body };
         Ok(self.ast.make(node))
     }
 
@@ -287,7 +303,9 @@ impl fmt::Display for ParserError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::Lexer(error) => write!(f, "{error}"),
-            Self::UnexpectedToken { expected, got } => write!(f, "expected {expected}, got '{got}'"),
+            Self::UnexpectedToken { expected, got } => {
+                write!(f, "expected {expected}, got '{got}'")
+            }
             Self::UnexpectedEof => write!(f, "unexpected end of file"),
         }
     }
@@ -323,11 +341,15 @@ pub enum Node {
         name: NodeId,
         value: NodeId,
     },
+    StatementBody(Vec<NodeId>),
+    Else {
+        body: NodeId,
+    },
     If {
         condition: NodeId,
         body: NodeId,
+        else_: Option<NodeId>,
     },
-    StatementBody(Vec<NodeId>),
     Assign {
         name: NodeId,
         value: NodeId,
