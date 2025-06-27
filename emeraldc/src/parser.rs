@@ -61,7 +61,7 @@ impl Parser {
 
     fn parse_declaration_body(&mut self) -> Result<NodeId, ParserError> {
         let mut body = Vec::new();
-        while !self.is_declaration_end()? {
+        while !self.is_declaration_body_end()? {
             let statement = self.parse_statement()?;
             body.push(statement);
         }
@@ -69,7 +69,7 @@ impl Parser {
         Ok(self.ast.make(node))
     }
 
-    fn is_declaration_end(&mut self) -> Result<bool, ParserError> {
+    fn is_declaration_body_end(&mut self) -> Result<bool, ParserError> {
         Ok(matches!(self.peek_token()?, Some(TokenKind::End)))
     }
 
@@ -77,6 +77,7 @@ impl Parser {
         match self.peek_token()? {
             Some(TokenKind::Let) => self.parse_let(),
             Some(TokenKind::Name(..)) => self.parse_assign(),
+            Some(TokenKind::If) => self.parse_if(),
             Some(got) => {
                 let error = ParserError::unexpected_token("statement", got.clone());
                 Err(error)
@@ -100,6 +101,30 @@ impl Parser {
         let value = self.parse_expression()?;
         let node = Node::Assign { name, value };
         Ok(self.ast.make(node))
+    }
+
+    fn parse_if(&mut self) -> Result<NodeId, ParserError> {
+        self.expect(TokenKind::If, "if")?;
+        let condition = self.parse_expression()?;
+        self.expect(TokenKind::OpenCurly, "expected '{' after if condition")?;
+        let body = self.parse_statement_body()?;
+        self.expect(TokenKind::CloseCurly, "expected '}' after if body")?;
+        let node = Node::If { condition, body };
+        Ok(self.ast.make(node))
+    }
+
+    fn parse_statement_body(&mut self) -> Result<NodeId, ParserError> {
+        let mut body = Vec::new();
+        while !self.is_statement_body_end()? {
+            let statement = self.parse_statement()?;
+            body.push(statement);
+        }
+        let node = Node::StatementBody(body);
+        Ok(self.ast.make(node))
+    }
+
+    fn is_statement_body_end(&mut self) -> Result<bool, ParserError> {
+        Ok(matches!(self.peek_token()?, Some(TokenKind::CloseCurly)))
     }
 
     fn parse_expression(&mut self) -> Result<NodeId, ParserError> {
@@ -298,6 +323,11 @@ pub enum Node {
         name: NodeId,
         value: NodeId,
     },
+    If {
+        condition: NodeId,
+        body: NodeId,
+    },
+    StatementBody(Vec<NodeId>),
     Assign {
         name: NodeId,
         value: NodeId,

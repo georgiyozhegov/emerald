@@ -21,4 +21,5 @@ fn main() {
         eprintln!("error: {error}");
         std::process::exit(1);
     });
+    println!("{ast:?}");
 }

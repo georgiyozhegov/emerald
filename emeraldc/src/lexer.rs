@@ -47,6 +47,7 @@ impl Lexer {
             "function" => TokenKind::Function,
             "end" => TokenKind::End,
             "let" => TokenKind::Let,
+            "if" => TokenKind::If,
             _ => TokenKind::Name(text),
         };
         token
@@ -93,6 +94,7 @@ pub enum TokenKind {
     Function,
     End,
     Let,
+    If,
     // punctuation
     Equal,
     OpenRound,
@@ -117,6 +119,7 @@ impl fmt::Display for TokenKind {
             Self::Function => write!(f, "function"),
             Self::End => write!(f, "end"),
             Self::Let => write!(f, "let"),
+            Self::If => write!(f, "if"),
             Self::Equal => write!(f, "="),
             Self::OpenRound => write!(f, "("),
             Self::CloseRound => write!(f, ")"),
