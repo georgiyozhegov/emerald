@@ -116,17 +116,7 @@ impl<'p> ExpressionParser<'p> {
     }
 
     fn parse_comparision(&mut self) -> NodeId {
-        let mut id = self.parse_term();
-        while let Some(operator) = self.maybe_comparision_operator() {
-            let right = self.parse_term();
-            let node = Node::Binary {
-                operator,
-                left: id,
-                right,
-            };
-            id = self.parser.ast.make(node);
-        }
-        id
+        self.parse_binary(Self::parse_term, Self::maybe_comparision_operator)
     }
 
     fn maybe_comparision_operator(&mut self) -> Option<BinaryOperator> {
@@ -138,17 +128,7 @@ impl<'p> ExpressionParser<'p> {
     }
 
     fn parse_term(&mut self) -> NodeId {
-        let mut id = self.parse_factor();
-        while let Some(operator) = self.maybe_term_operator() {
-            let right = self.parse_factor();
-            let node = Node::Binary {
-                operator,
-                left: id,
-                right,
-            };
-            id = self.parser.ast.make(node);
-        }
-        id
+        self.parse_binary(Self::parse_factor, Self::maybe_term_operator)
     }
 
     fn maybe_term_operator(&mut self) -> Option<BinaryOperator> {
@@ -160,17 +140,7 @@ impl<'p> ExpressionParser<'p> {
     }
 
     fn parse_factor(&mut self) -> NodeId {
-        let mut id = self.parse_unary();
-        while let Some(operator) = self.maybe_factor_operator() {
-            let right = self.parse_unary();
-            let node = Node::Binary {
-                operator,
-                left: id,
-                right,
-            };
-            id = self.parser.ast.make(node);
-        }
-        id
+        self.parse_binary(Self::parse_unary, Self::maybe_factor_operator)
     }
 
     fn maybe_factor_operator(&mut self) -> Option<BinaryOperator> {
@@ -179,6 +149,24 @@ impl<'p> ExpressionParser<'p> {
             TokenKind::Star | TokenKind::Slash,
         )
         .then(|| self.parse_binary_operator())
+    }
+
+    fn parse_binary(
+        &mut self,
+        parse_higher: impl Fn(&mut Self) -> NodeId,
+        maybe_operator: impl Fn(&mut Self) -> Option<BinaryOperator>,
+    ) -> NodeId {
+        let mut id = parse_higher(self);
+        while let Some(operator) = maybe_operator(self) {
+            let right = parse_higher(self);
+            let node = Node::Binary {
+                operator,
+                left: id,
+                right,
+            };
+            id = self.parser.ast.make(node);
+        }
+        id
     }
 
     fn parse_binary_operator(&mut self) -> BinaryOperator {
