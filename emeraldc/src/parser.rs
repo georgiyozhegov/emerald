@@ -1,4 +1,6 @@
-use std::{fmt::{self, Debug}, iter::Peekable, ops::Index};
+use std::iter::Peekable;
+use std::ops::Index;
+use std::fmt;
 
 use crate::lexer::{Lexer, LexerError, TokenKind};
 
@@ -74,6 +76,7 @@ impl Parser {
     fn parse_statement(&mut self) -> Result<NodeId, ParserError> {
         match self.peek_token()? {
             Some(TokenKind::Let) => self.parse_let(),
+            Some(TokenKind::Name(..)) => self.parse_assign(),
             Some(got) => {
                 let error = ParserError::unexpected_token("statement", got.clone());
                 Err(error)
@@ -88,6 +91,14 @@ impl Parser {
         self.expect(TokenKind::Equal, "=")?;
         let value = self.parse_expression()?;
         let node = Node::Let { name, value };
+        Ok(self.ast.make(node))
+    }
+
+    fn parse_assign(&mut self) -> Result<NodeId, ParserError> {
+        let name = self.parse_name()?;
+        self.expect(TokenKind::Equal, "=")?;
+        let value = self.parse_expression()?;
+        let node = Node::Assign { name, value };
         Ok(self.ast.make(node))
     }
 
@@ -251,7 +262,7 @@ impl fmt::Display for ParserError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::Lexer(error) => write!(f, "{error}"),
-            Self::UnexpectedToken { expected, got } => write!(f, "expected {expected}, got {got:?}"),
+            Self::UnexpectedToken { expected, got } => write!(f, "expected {expected}, got '{got}'"),
             Self::UnexpectedEof => write!(f, "unexpected end of file"),
         }
     }
@@ -284,6 +295,10 @@ pub enum Node {
         right: NodeId,
     },
     Let {
+        name: NodeId,
+        value: NodeId,
+    },
+    Assign {
         name: NodeId,
         value: NodeId,
     },
