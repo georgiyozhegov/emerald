@@ -111,11 +111,7 @@ impl Parser {
         let body = self.parse_statement_body()?;
         self.expect(TokenKind::CloseCurly, "'}' after if body")?;
         let else_ = self.maybe_else()?;
-        let node = Node::If {
-            condition,
-            body,
-            else_,
-        };
+        let node = Node::If { condition, body, else_ };
         Ok(self.ast.make(node))
     }
 
@@ -381,7 +377,7 @@ pub enum Node {
 }
 
 #[non_exhaustive]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub enum BinaryOperator {
     Add,
     Subtract,
@@ -400,58 +396,5 @@ impl Index<NodeId> for Ast {
 
     fn index(&self, id: NodeId) -> &Self::Output {
         &self.tree[id.0]
-    }
-}
-
-pub trait Visit {
-    type Output;
-
-    fn visit_name(&mut self, name: &str) -> Self::Output;
-    fn visit_integer(&mut self, value: i128) -> Self::Output;
-    fn visit_binary(
-        &mut self,
-        operator: BinaryOperator,
-        left: NodeId,
-        right: NodeId,
-    ) -> Self::Output;
-    fn visit_let(&mut self, name: NodeId, value: NodeId) -> Self::Output;
-    fn visit_assign(&mut self, name: NodeId, value: NodeId) -> Self::Output;
-    fn visit_statement_body(&mut self, body: &[NodeId]) -> Self::Output;
-    fn visit_else(&mut self, body: NodeId) -> Self::Output;
-    fn visit_if(&mut self, condition: NodeId, body: NodeId, else_: Option<NodeId>) -> Self::Output;
-    fn visit_while(&mut self, condition: NodeId, body: NodeId) -> Self::Output;
-    fn visit_declaration_body(&mut self, body: &[NodeId]) -> Self::Output;
-    fn visit_function(&mut self, name: NodeId, body: NodeId) -> Self::Output;
-}
-
-impl Ast {
-    pub fn accept<V>(&self, visitor: &mut V)
-    where
-        V: Visit,
-    {
-        for node in self.tree.iter() {
-            match node {
-                Node::Name(name) => visitor.visit_name(name),
-                Node::Integer(value) => visitor.visit_integer(*value),
-                Node::Binary {
-                    operator,
-                    left,
-                    right,
-                } => visitor.visit_binary(*operator, *left, *right),
-                Node::Let { name, value } => visitor.visit_let(*name, *value),
-                Node::Assign { name, value } => visitor.visit_assign(*name, *value),
-                Node::StatementBody(body) => visitor.visit_statement_body(body),
-                Node::Else { body } => visitor.visit_else(*body),
-                Node::If {
-                    condition,
-                    body,
-                    else_,
-                } => visitor.visit_if(*condition, *body, *else_),
-                Node::While { condition, body } => visitor.visit_while(*condition, *body),
-                Node::DeclarationBody(body) => visitor.visit_declaration_body(body),
-                Node::Function { name, body } => visitor.visit_function(*name, *body),
-                _ => todo!(),
-            };
-        }
     }
 }
