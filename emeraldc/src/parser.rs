@@ -339,6 +339,7 @@ impl Ast {
     }
 }
 
+#[non_exhaustive]
 #[derive(Debug)]
 pub enum Node {
     Name(String),
