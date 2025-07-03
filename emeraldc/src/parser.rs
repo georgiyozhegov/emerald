@@ -1,13 +1,12 @@
 use std::fmt;
 use std::iter::Peekable;
-use std::ops::Index;
 
 use crate::lexer::{Lexer, LexerError, TokenKind};
 
 #[derive(Debug)]
 pub struct Parser {
     lexer: Peekable<Lexer>,
-    pub ast: Ast,
+    pub ast: Par,
 }
 
 impl Parser {
@@ -18,7 +17,7 @@ impl Parser {
         }
     }
 
-    pub fn parse(mut self) -> Result<(Vec<NodeId>, Ast), ParserError> {
+    pub fn parse(mut self) -> Result<(Vec<NodeId>, Ast<Node>), ParserError> {
         let mut program = Vec::new();
         while let Some(declaration) = self.parse_declaration()? {
             program.push(declaration);
@@ -111,7 +110,11 @@ impl Parser {
         let body = self.parse_statement_body()?;
         self.expect(TokenKind::CloseCurly, "'}' after if body")?;
         let else_ = self.maybe_else()?;
-        let node = Node::If { condition, body, else_ };
+        let node = Node::If {
+            condition,
+            body,
+            else_,
+        };
         Ok(self.ast.make(node))
     }
 
@@ -322,59 +325,48 @@ impl fmt::Display for ParserError {
     }
 }
 
-#[derive(Debug)]
-pub struct Ast {
-    tree: Vec<Node>,
-}
-
-impl Ast {
-    pub fn new() -> Self {
-        Self { tree: Vec::new() }
-    }
-
-    pub fn make(&mut self, node: Node) -> NodeId {
-        let index = self.tree.len();
-        self.tree.push(node);
-        NodeId(index)
-    }
-}
+pub type ParseTree = Vec<ParseNode>;
+pub type ParseNodeId = usize;
 
 #[non_exhaustive]
 #[derive(Debug)]
-pub enum Node {
+pub enum ParseNode {
+    // expressions
     Name(String),
     Integer(i128),
     Binary {
         operator: BinaryOperator,
-        left: NodeId,
-        right: NodeId,
+        left: ParseNodeId,
+        right: ParseNodeId,
     },
+    // statements
     Let {
-        name: NodeId,
-        value: NodeId,
+        name: ParseNodeId,
+        value: ParseNodeId,
     },
     Assign {
-        name: NodeId,
-        value: NodeId,
+        name: ParseNodeId,
+        value: ParseNodeId,
     },
-    StatementBody(Vec<NodeId>),
     Else {
-        body: NodeId,
+        body: ParseNodeId,
     },
     If {
-        condition: NodeId,
-        body: NodeId,
-        else_: Option<NodeId>,
+        condition: ParseNodeId,
+        body: ParseNodeId,
+        else_: Option<ParseNodeId>,
     },
     While {
-        condition: NodeId,
-        body: NodeId,
+        condition: ParseNodeId,
+        body: ParseNodeId,
     },
-    DeclarationBody(Vec<NodeId>),
+    StatementBody(Vec<ParseNodeId>),
+    // declarations
     Function {
-        name: NodeId,
-        body: NodeId,
+        name: ParseNodeId,
+        body: ParseNodeId,
     },
+    DeclarationBody(Vec<ParseNodeId>),
 }
 
 #[non_exhaustive]
@@ -389,13 +381,17 @@ pub enum BinaryOperator {
     Less,
 }
 
-#[derive(Debug, Clone, Copy)]
-pub struct NodeId(usize);
-
-impl Index<NodeId> for Ast {
-    type Output = Node;
-
-    fn index(&self, id: NodeId) -> &Self::Output {
-        &self.tree[id.0]
+impl fmt::Display for BinaryOperator {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let token = match self {
+            Self::Add => TokenKind::Plus,
+            Self::Subtract => TokenKind::Minus,
+            Self::Multiply => TokenKind::Star,
+            Self::Divide => TokenKind::Slash,
+            Self::Equal => TokenKind::Question,
+            Self::Greater => TokenKind::RightAngle,
+            Self::Less => TokenKind::LeftAngle,
+        };
+        write!(f, "{token}")
     }
 }
