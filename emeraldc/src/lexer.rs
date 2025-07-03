@@ -42,7 +42,8 @@ impl Lexer {
     }
 
     fn lex_name_or_keyword(&mut self) -> TokenKind {
-        let text = self.take_while(|c| matches!(c, 'a'..'z' | 'A'..'Z' | '_' | '0'..'9'));
+        let text = self
+            .take_while(|c| matches!(c, 'a'..'z' | 'A'..'Z' | '_' | '0'..'9'));
         let token = match text.as_str() {
             "function" => TokenKind::Function,
             "end" => TokenKind::End,
@@ -166,7 +167,10 @@ impl SourceBuffer {
         self.iter.peek().cloned()
     }
 
-    pub fn next_if(&mut self, predicate: impl Fn(char) -> bool) -> Option<char> {
+    pub fn next_if(
+        &mut self,
+        predicate: impl Fn(char) -> bool,
+    ) -> Option<char> {
         let c = self.iter.next_if(|c: &char| predicate(*c))?;
         self.cursor += 1;
         Some(c)

@@ -5,3 +5,10 @@ version = 4
 [[package]]
 name = "emeraldc"
 version = "0.1.0"
+dependencies = [
+ "emeraldc-lexer",
+]
+
+[[package]]
+name = "emeraldc-lexer"
+version = "0.1.0"

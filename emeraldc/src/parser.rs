@@ -29,7 +29,8 @@ impl Parser {
         let id = match self.peek_token()? {
             Some(TokenKind::Function) => self.parse_function(),
             Some(got) => {
-                let error = ParserError::unexpected_token("declaration", got.clone());
+                let error =
+                    ParserError::unexpected_token("declaration", got.clone());
                 Err(error)
             }
             _eof => {
@@ -79,7 +80,8 @@ impl Parser {
             Some(TokenKind::If) => self.parse_if(),
             Some(TokenKind::While) => self.parse_while(),
             Some(got) => {
-                let error = ParserError::unexpected_token("statement", got.clone());
+                let error =
+                    ParserError::unexpected_token("statement", got.clone());
                 Err(error)
             }
             _eof => Err(ParserError::UnexpectedEof),
@@ -162,7 +164,11 @@ impl Parser {
         parser.parse()
     }
 
-    fn expect(&mut self, token: TokenKind, message: &'static str) -> Result<(), ParserError> {
+    fn expect(
+        &mut self,
+        token: TokenKind,
+        message: &'static str,
+    ) -> Result<(), ParserError> {
         let next = self.next_token()?;
         if next != token {
             let error = ParserError::unexpected_token(message, next);
@@ -212,11 +218,15 @@ impl<'p> ExpressionParser<'p> {
         self.parse_binary(Self::parse_term, Self::maybe_comparision_operator)
     }
 
-    fn maybe_comparision_operator(&mut self) -> Result<Option<BinaryOperator>, ParserError> {
+    fn maybe_comparision_operator(
+        &mut self,
+    ) -> Result<Option<BinaryOperator>, ParserError> {
         let next = self.parser.peek_token()?;
         matches!(
             next,
-            Some(TokenKind::Question) | Some(TokenKind::RightAngle) | Some(TokenKind::LeftAngle)
+            Some(TokenKind::Question)
+                | Some(TokenKind::RightAngle)
+                | Some(TokenKind::LeftAngle)
         )
         .then(|| self.parse_binary_operator())
         .transpose()
@@ -226,7 +236,9 @@ impl<'p> ExpressionParser<'p> {
         self.parse_binary(Self::parse_factor, Self::maybe_term_operator)
     }
 
-    fn maybe_term_operator(&mut self) -> Result<Option<BinaryOperator>, ParserError> {
+    fn maybe_term_operator(
+        &mut self,
+    ) -> Result<Option<BinaryOperator>, ParserError> {
         let next = self.parser.peek_token()?;
         matches!(next, Some(TokenKind::Plus) | Some(TokenKind::Minus))
             .then(|| self.parse_binary_operator())
@@ -237,7 +249,9 @@ impl<'p> ExpressionParser<'p> {
         self.parse_binary(Self::parse_unary, Self::maybe_factor_operator)
     }
 
-    fn maybe_factor_operator(&mut self) -> Result<Option<BinaryOperator>, ParserError> {
+    fn maybe_factor_operator(
+        &mut self,
+    ) -> Result<Option<BinaryOperator>, ParserError> {
         let next = self.parser.peek_token()?;
         matches!(next, Some(TokenKind::Star) | Some(TokenKind::Slash))
             .then(|| self.parse_binary_operator())
@@ -247,7 +261,10 @@ impl<'p> ExpressionParser<'p> {
     fn parse_binary(
         &mut self,
         parse_higher: impl Fn(&mut Self) -> Result<NodeId, ParserError>,
-        maybe_operator: impl Fn(&mut Self) -> Result<Option<BinaryOperator>, ParserError>,
+        maybe_operator: impl Fn(
+            &mut Self,
+        )
+            -> Result<Option<BinaryOperator>, ParserError>,
     ) -> Result<NodeId, ParserError> {
         let mut id = parse_higher(self)?;
         while let Some(operator) = maybe_operator(self)? {
