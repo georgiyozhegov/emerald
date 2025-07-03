@@ -1,5 +1,5 @@
 /// A token factory.
-pub struct TokenFactory;
+pub(crate) struct TokenFactory;
 
 impl TokenFactory {
     /// Creates a new token from an alphabetic buffer.

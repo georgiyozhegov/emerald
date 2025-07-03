@@ -5,18 +5,17 @@ use crate::{
     CharClassifier, CharGroup, Token, TokenFactory, TokenFactoryError,
 };
 
-pub type LexerSource = Peekable<vec::IntoIter<char>>;
+pub(crate) type LexerSource = Peekable<vec::IntoIter<char>>;
 pub type LexerOutput = Vec<Result<Token, LexerError>>;
 
 /// Splits a source buffer into tokens.
-pub struct Lexer {
+pub(crate) struct Lexer {
     source: LexerSource,
 }
 
 impl Lexer {
-    pub fn new(iter: vec::IntoIter<char>) -> Self {
-        let peekable = iter.peekable();
-        Self { source: peekable }
+    pub fn new(source: LexerSource) -> Self {
+        Self { source }
     }
 
     /// Perform lexing.

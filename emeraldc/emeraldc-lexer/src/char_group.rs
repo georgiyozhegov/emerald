@@ -1,5 +1,5 @@
 /// Classifies characters into lexical groups.
-pub struct CharClassifier;
+pub(crate) struct CharClassifier;
 
 impl CharClassifier {
     pub fn group(c: &char) -> CharGroup {
@@ -14,7 +14,7 @@ impl CharClassifier {
 
 /// A lexical group.
 #[derive(Debug)]
-pub enum CharGroup {
+pub(crate) enum CharGroup {
     Alphabetic,
     Numeric,
     Invisible,
