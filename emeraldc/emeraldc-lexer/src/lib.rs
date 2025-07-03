@@ -1,4 +1,5 @@
 mod char_group;
+use char_group::*;
 mod lexer;
 pub use lexer::*;
 mod token;

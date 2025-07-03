@@ -4,7 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [workspace]
-members = ["emeraldc-lexer"]
+members = ["emeraldc-lexer", "emeraldc-parser"]
 
 [dependencies]
 emeraldc-lexer = { path = "emeraldc-lexer" }
+emeraldc-parser = { path = "emeraldc-parser" }
