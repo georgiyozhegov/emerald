@@ -4,14 +4,15 @@ use std::vec;
 use emeraldc_lexer::{LexerError, Token};
 
 use crate::{
-    BodyNode, DeclarationNode, DummyToken, ExpressionNode, IdentifierNode,
-    ParseTree, StatementNode,
+    BodyNode, DeclarationNode, DeclarationParser, DummyToken, ExpressionNode,
+    ExpressionParser, IdentifierNode, ParseTree, StatementNode,
+    StatementParser,
 };
 
 /// Constructs a parse tree from tokens.
 #[derive(Debug)]
 pub struct Parser {
-    source: ParserSource,
+    pub(crate) source: ParserSource,
 }
 
 impl Parser {
@@ -53,24 +54,25 @@ impl Parser {
     pub(crate) fn parse_expression(
         &mut self,
     ) -> Result<ExpressionNode, ParserError> {
-        todo!()
+        let parser = ExpressionParser::new(self);
+        dbg!(parser.parse())
     }
 
     /// Parse a declaration/statement body.
     pub(crate) fn parse_body(&mut self) -> Result<BodyNode, ParserError> {
         let mut body = Vec::new();
-        while let Some(statement) = self.parse_statement() {
-            body.push(statement?);
+        while self.source.peek()? != DummyToken::End {
+            let statement = self.parse_statement()?;
+            body.push(statement);
         }
         let node = BodyNode { body };
         Ok(node)
     }
 
     /// Parse a single statement.
-    fn parse_statement(
-        &mut self,
-    ) -> Option<Result<StatementNode, ParserError>> {
-        todo!()
+    fn parse_statement(&mut self) -> Result<StatementNode, ParserError> {
+        let parser = StatementParser::new(self);
+        dbg!(parser.parse())
     }
 
     /// Check if next token matches the expected one.
@@ -125,44 +127,22 @@ impl ParserSource {
         self.peek().is_ok_and(|t| t == DummyToken::Eof)
     }
 }
-
-/// Parses declarations.
-pub struct DeclarationParser<'p> {
-    parser: &'p mut Parser,
-}
-
-impl<'p> DeclarationParser<'p> {
-    pub fn new(parser: &'p mut Parser) -> Self {
-        Self { parser }
-    }
-
-    /// Parse a single declaration.
-    pub fn parse(mut self) -> Result<DeclarationNode, ParserError> {
-        match self.parser.source.peek()? {
-            DummyToken::Function => self.parse_function(),
-            got => {
-                let error = ParserError::ExpectedDeclaration { got };
-                Err(error)
-            }
-        }
-    }
-
-    /// Parse function declaration.
-    fn parse_function(&mut self) -> Result<DeclarationNode, ParserError> {
-        self.parser.expect(DummyToken::Function)?;
-        let identifier = self.parser.parse_identifier()?;
-        self.parser.expect(DummyToken::OpenRound)?;
-        self.parser.expect(DummyToken::CloseRound)?;
-        let body = self.parser.parse_body()?;
-        let node = DeclarationNode::Function { identifier, body };
-        Ok(node)
-    }
-}
-
 #[derive(Debug, Clone)]
 pub enum ParserError {
     Lexer(LexerError),
     UnexpectedEof,
-    UnexpectedToken { expected: DummyToken, got: Token },
-    ExpectedDeclaration { got: DummyToken },
+    UnexpectedToken {
+        expected: DummyToken,
+        got: Token,
+    },
+    UnexpectedTokenStr {
+        expected: &'static str,
+        got: DummyToken,
+    },
+    ExpectedDeclaration {
+        got: DummyToken,
+    },
+    ExpectedStatement {
+        got: DummyToken,
+    },
 }

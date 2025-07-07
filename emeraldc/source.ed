@@ -1,5 +1,5 @@
 function main()
-    let a = 5
+    let a = 5 + 2 * 3 > 2
     if a < 10 {
         a = 3
     } else {

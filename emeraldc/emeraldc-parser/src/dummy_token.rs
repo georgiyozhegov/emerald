@@ -50,6 +50,7 @@ impl From<&Token> for DummyToken {
             Token::If => Self::If,
             Token::Else => Self::Else,
             Token::While => Self::While,
+            Token::Equal => Self::Equal,
             Token::OpenRound => Self::OpenRound,
             Token::CloseRound => Self::CloseRound,
             Token::OpenCurly => Self::OpenCurly,
