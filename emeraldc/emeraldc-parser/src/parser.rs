@@ -17,26 +17,30 @@ pub struct Parser {
 
 impl Parser {
     pub fn new(source: ParserSource) -> Self {
+        log::debug!("initializing parser");
         Self { source }
     }
 
     /// Parse a program.
     pub fn parse(mut self) -> ParseTree {
         let mut pt = ParseTree::new();
-        while let Some(declaration) = self.parse_declaration() {
+        while let Some(declaration) = self.maybe_declaration() {
             pt.program.push(declaration);
         }
         pt
     }
 
+    fn maybe_declaration(&mut self) -> Option<Result<DeclarationNode, ParserError>> {
+        (!self.source.is_eof()).then(|| {})?;
+        let node = self.parse_declaration();
+        Some(node)
+    }
+
     /// Parse a single declaration.
     fn parse_declaration(
         &mut self,
-    ) -> Option<Result<DeclarationNode, ParserError>> {
-        (!self.source.is_eof()).then(|| {})?;
-        let parser = DeclarationParser::new(self);
-        let node = parser.parse();
-        Some(node)
+    ) -> Result<DeclarationNode, ParserError> {
+        DeclarationParser::new(self).parse()
     }
 
     /// Parse an identifier.
@@ -47,6 +51,7 @@ impl Parser {
             unreachable!()
         };
         let node = IdentifierNode { name };
+        log::trace!("identifier: {node:?}");
         Ok(node)
     }
 
@@ -54,8 +59,7 @@ impl Parser {
     pub(crate) fn parse_expression(
         &mut self,
     ) -> Result<ExpressionNode, ParserError> {
-        let parser = ExpressionParser::new(self);
-        dbg!(parser.parse())
+        ExpressionParser::new(self).parse()
     }
 
     /// Parse a declaration/statement body.
@@ -66,13 +70,13 @@ impl Parser {
             body.push(statement);
         }
         let node = BodyNode { body };
+        log::trace!("body: {node:?}");
         Ok(node)
     }
 
     /// Parse a single statement.
     fn parse_statement(&mut self) -> Result<StatementNode, ParserError> {
-        let parser = StatementParser::new(self);
-        dbg!(parser.parse())
+        StatementParser::new(self).parse_synchronized()
     }
 
     /// Check if next token matches the expected one.
@@ -82,6 +86,7 @@ impl Parser {
         if as_dummy == token {
             Ok(next)
         } else {
+            log::error!("expected {token:?}, got {next:?}");
             let error = ParserError::UnexpectedToken {
                 expected: token,
                 got: next,

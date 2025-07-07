@@ -16,6 +16,8 @@ impl<'p> DeclarationParser<'p> {
         match self.parser.source.peek()? {
             DummyToken::Function => self.parse_function(),
             got => {
+                self.parser.source.next()?;
+                log::error!("expected declaration, got {got:?}");
                 let error = ParserError::ExpectedDeclaration { got };
                 Err(error)
             }
@@ -30,6 +32,7 @@ impl<'p> DeclarationParser<'p> {
         self.parser.expect(DummyToken::CloseRound)?;
         let body = self.parser.parse_body()?;
         let node = DeclarationNode::Function { identifier, body };
+        log::trace!("function: {node:?}");
         Ok(node)
     }
 }

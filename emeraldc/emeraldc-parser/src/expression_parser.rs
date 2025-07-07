@@ -1,8 +1,8 @@
 use emeraldc_lexer::Token;
+use log::trace;
 
 use crate::{
-    BinaryOperatorNode,
-    DummyToken, ExpressionNode, Parser, ParserError,
+    BinaryOperatorNode, DummyToken, ExpressionNode, Parser, ParserError,
 };
 
 /// Parses expressions.
@@ -18,14 +18,14 @@ impl<'p> ExpressionParser<'p> {
 
     /// Parse a single expression.
     pub fn parse(mut self) -> Result<ExpressionNode, ParserError> {
-        self.parse_comparision()
+        self.parse_comparison()
     }
 
-    /// Parse a single comparision binary expression.
-    fn parse_comparision(&mut self) -> Result<ExpressionNode, ParserError> {
+    /// Parse a single comparison binary expression.
+    fn parse_comparison(&mut self) -> Result<ExpressionNode, ParserError> {
         let mut node = self.parse_term()?;
         while let Some(operator) =
-            BinaryOperatorFactory::from_comparision(self.parser.source.peek()?)
+            BinaryOperatorFactory::from_comparison(self.parser.source.peek()?)
         {
             self.parser.source.next().unwrap(); // always ok
             let right = self.parse_term()?;
@@ -35,6 +35,7 @@ impl<'p> ExpressionParser<'p> {
                 right: Box::new(right),
             };
         }
+        log::trace!("comparison: {node:?}");
         Ok(node)
     }
 
@@ -52,6 +53,7 @@ impl<'p> ExpressionParser<'p> {
                 right: Box::new(right),
             };
         }
+        log::trace!("term: {node:?}");
         Ok(node)
     }
 
@@ -69,6 +71,7 @@ impl<'p> ExpressionParser<'p> {
                 right: Box::new(right),
             };
         }
+        log::trace!("factor: {node:?}");
         Ok(node)
     }
 
@@ -85,6 +88,7 @@ impl<'p> ExpressionParser<'p> {
                 Ok(ExpressionNode::Integer(value))
             }
             got => {
+                log::error!("expected identifier or literal, got {got:?}");
                 let error = ParserError::UnexpectedTokenStr {
                     expected: "identifier or literal",
                     got,
@@ -98,7 +102,7 @@ impl<'p> ExpressionParser<'p> {
 struct BinaryOperatorFactory;
 
 impl BinaryOperatorFactory {
-    pub fn from_comparision(token: DummyToken) -> Option<BinaryOperatorNode> {
+    pub fn from_comparison(token: DummyToken) -> Option<BinaryOperatorNode> {
         match token {
             DummyToken::Equal => Some(BinaryOperatorNode::Equal),
             DummyToken::RightAngle => Some(BinaryOperatorNode::Greater),
