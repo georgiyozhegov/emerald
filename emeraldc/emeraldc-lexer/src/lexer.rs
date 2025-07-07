@@ -15,6 +15,7 @@ pub(crate) struct Lexer {
 
 impl Lexer {
     pub fn new(source: LexerSource) -> Self {
+        log::debug!("initializing lexer");
         Self { source }
     }
 
@@ -38,6 +39,9 @@ impl Lexer {
             CharGroup::MaybePunctuation => self.lex_punctuation(),
             _ => todo!(),
         };
+        if let Ok(ref token) = token {
+            log::trace!("token: {token:?}");
+        }
         Some(token)
     }
 
@@ -72,10 +76,9 @@ impl Lexer {
 
     /// Lex a punctuation token.
     fn lex_punctuation(&mut self) -> Result<Token, LexerError> {
-        let c = self.source.peek().unwrap(); // always is some
-        let token = TokenFactory::from_punctuation(c)
+        let c = self.source.next().unwrap(); // skip current
+        let token = TokenFactory::from_punctuation(&c)
             .map_err(|e| LexerError::TokenFactory(e))?;
-        self.source.next().unwrap(); // skip current
         Ok(token)
     }
 

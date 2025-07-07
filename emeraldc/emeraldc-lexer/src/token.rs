@@ -17,10 +17,10 @@ impl TokenFactory {
 
     /// Creates a new token from a numeric buffer.
     pub fn from_numeric(buffer: String) -> Result<Token, TokenFactoryError> {
-        let value: i128 = buffer
-            .as_str()
-            .parse()
-            .map_err(|_e| TokenFactoryError::IntegerTooBig { buffer })?;
+        let value: i128 = buffer.as_str().parse().map_err(|_e| {
+            log::error!("integer is too big: {buffer:?}");
+            TokenFactoryError::IntegerTooBig { buffer }
+        })?;
         let token = Token::Integer(value);
         Ok(token)
     }
@@ -41,6 +41,7 @@ impl TokenFactory {
             '>' => Ok(Token::RightAngle),
             '<' => Ok(Token::LeftAngle),
             unknown => {
+                log::error!("unknown char: {unknown:?}");
                 let error = TokenFactoryError::UnknownChar(*unknown);
                 Err(error)
             }

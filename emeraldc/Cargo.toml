@@ -9,3 +9,5 @@ members = ["emeraldc-lexer", "emeraldc-parser"]
 [dependencies]
 emeraldc-lexer = { path = "emeraldc-lexer" }
 emeraldc-parser = { path = "emeraldc-parser" }
+env_logger = { version = "0.11.8", default-features = false, features = ["auto-color"] }
+log = "0.4.27"
