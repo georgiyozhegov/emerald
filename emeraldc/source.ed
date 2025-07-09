@@ -1,4 +1,4 @@
 function main()
-    let a = 5 + 2 * 3 > 8
+    let a = 5 + 2 * 3 > 8;
     boo let b = a + 2
 end

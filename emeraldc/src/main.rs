@@ -1,15 +1,27 @@
-use emeraldc_parser::ParserSource;
+// use emeraldc_parser::ParserSource;
+use emeraldc_tokenizer::Tokenizer;
 
 fn main() {
     env_logger::init();
 
-    let source = std::fs::read_to_string("source.ed").unwrap();
-    let tokens = emeraldc_lexer::lex(source);
+    let source = "function name() let a = 1 end";
+    let tokens = Tokenizer::tokenize(source);
+    for token in tokens {
+        println!("{token:?}");
+    }
+
+    /*
+    let text = std::fs::read_to_string("source.ed").unwrap();
+    let sb = emeraldc_lexer::SourceBuffer::new(text);
+    let tokens = emeraldc_lexer::Lexer::new(sb).lex(&mut reporter);
     let tokens_iter = tokens.into_iter().peekable();
+    */
+
+    /*
     let source = ParserSource::new(tokens_iter);
-    let parser = emeraldc_parser::Parser::new(source);
-    let pt = parser.parse();
+    let pt = emeraldc_parser::Parser::new(source).parse();
     for declaration in pt.program.iter() {
         println!("{declaration:?}");
     }
+    */
 }

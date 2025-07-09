@@ -12,11 +12,11 @@ use crate::{
 /// Constructs a parse tree from tokens.
 #[derive(Debug)]
 pub struct Parser {
-    pub(crate) source: ParserSource,
+    pub(crate) source: TokenizedSource,
 }
 
 impl Parser {
-    pub fn new(source: ParserSource) -> Self {
+    fn new(source: ParserSource) -> Self {
         log::debug!("initializing parser");
         Self { source }
     }
@@ -30,16 +30,16 @@ impl Parser {
         pt
     }
 
-    fn maybe_declaration(&mut self) -> Option<Result<DeclarationNode, ParserError>> {
+    fn maybe_declaration(
+        &mut self,
+    ) -> Option<Result<DeclarationNode, ParserError>> {
         (!self.source.is_eof()).then(|| {})?;
         let node = self.parse_declaration();
         Some(node)
     }
 
     /// Parse a single declaration.
-    fn parse_declaration(
-        &mut self,
-    ) -> Result<DeclarationNode, ParserError> {
+    fn parse_declaration(&mut self) -> Result<DeclarationNode, ParserError> {
         DeclarationParser::new(self).parse()
     }
 
@@ -102,9 +102,9 @@ pub struct ParserSource {
 }
 
 impl ParserSource {
-    pub fn new(
-        iter: Peekable<vec::IntoIter<Result<Token, LexerError>>>,
-    ) -> Self {
+    pub fn from_token_stream(tokens: Vec<Result<Token, LexerError>>) -> Self {}
+
+    fn new(iter: Peekable<vec::IntoIter<Result<Token, LexerError>>>) -> Self {
         Self { iter }
     }
 
@@ -132,6 +132,7 @@ impl ParserSource {
         self.peek().is_ok_and(|t| t == DummyToken::Eof)
     }
 }
+
 #[derive(Debug, Clone)]
 pub enum ParserError {
     Lexer(LexerError),

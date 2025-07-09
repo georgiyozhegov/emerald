@@ -1,51 +1,52 @@
-use std::iter::Peekable;
-use std::vec;
-
 use crate::{
-    CharClassifier, CharGroup, Token, TokenFactory, TokenFactoryError,
+    CharClassifier, CharGroup, SourceBuffer, Token, TokenFactory,
+    TokenFactoryError,
 };
 
-pub(crate) type LexerSource = Peekable<vec::IntoIter<char>>;
-pub type LexerOutput = Vec<Result<Token, LexerError>>;
-
-/// Splits a source buffer into tokens.
-pub(crate) struct Lexer {
-    source: LexerSource,
+pub struct Lexer {
+    source: SourceBuffer,
 }
 
+// initialization
 impl Lexer {
-    pub fn new(source: LexerSource) -> Self {
-        log::debug!("initializing lexer");
+    pub fn new(source: SourceBuffer) -> Self {
         Self { source }
     }
+}
 
-    /// Perform lexing.
-    pub fn lex(mut self) -> LexerOutput {
-        let mut output = Vec::new();
-        while let Some(token) = self.lex_token() {
-            output.push(token);
+// iterator implementation
+impl Iterator for Lexer {
+    type Item = Result<Token, LexerError>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.maybe_token()
+    }
+}
+
+// logic
+impl Lexer {
+    fn maybe_token(&mut self) -> Option<Result<Token, LexerError>> {
+        let c = self.source.current();
+        if !CharClassifier::group(c).is_eof() {
+            let token = self.lex_token();
+            Some(token)
+        } else {
+            None
         }
-        output
     }
 
-    /// Lex a single token.
-    fn lex_token(&mut self) -> Option<Result<Token, LexerError>> {
+    fn lex_token(&mut self) -> Result<Token, LexerError> {
         self.skip_invisible();
-        let next = self.source.peek()?;
-        let group = CharClassifier::group(next);
-        let token = match group {
+        let c = self.source.current();
+        let group = CharClassifier::group(c);
+        match group {
             CharGroup::Alphabetic => self.lex_alphabetic(),
             CharGroup::Numeric => self.lex_numeric(),
             CharGroup::MaybePunctuation => self.lex_punctuation(),
-            _ => todo!(),
-        };
-        if let Ok(ref token) = token {
-            log::trace!("token: {token:?}");
+            CharGroup::Invisible | CharGroup::Eof => unreachable!(),
         }
-        Some(token)
     }
 
-    /// Skip invisible characters.
     fn skip_invisible(&mut self) {
         let _invisible = self.take_while(|c| {
             let group = CharClassifier::group(c);
@@ -53,7 +54,6 @@ impl Lexer {
         });
     }
 
-    /// Lex an alphabetic token.
     fn lex_alphabetic(&mut self) -> Result<Token, LexerError> {
         let buffer = self.take_while(|c| {
             let group = CharClassifier::group(c);
@@ -63,7 +63,6 @@ impl Lexer {
         Ok(token)
     }
 
-    /// Lex a numeric token.
     fn lex_numeric(&mut self) -> Result<Token, LexerError> {
         let buffer = self.take_while(|c| {
             let group = CharClassifier::group(c);
@@ -74,21 +73,20 @@ impl Lexer {
         Ok(token)
     }
 
-    /// Lex a punctuation token.
     fn lex_punctuation(&mut self) -> Result<Token, LexerError> {
-        let c = self.source.next().unwrap(); // skip current
-        let token = TokenFactory::from_punctuation(&c)
+        let c = self.source.eat();
+        let token = TokenFactory::from_punctuation(c)
             .map_err(|e| LexerError::TokenFactory(e))?;
         Ok(token)
     }
 
-    /// Collect characters in a buffer while predicate is true.
-    fn take_while(&mut self, predicate: impl Fn(&char) -> bool) -> String {
-        let mut buffer = String::new();
-        while let Some(c) = self.source.next_if(&predicate) {
-            buffer.push(c);
+    fn take_while(&mut self, predicate: impl Fn(char) -> bool) -> &str {
+        let start = self.source.cursor();
+        while predicate(self.source.current()) {
+            self.source.advance();
         }
-        buffer
+        let end = self.source.cursor();
+        self.source.substring(start, end)
     }
 }
 
