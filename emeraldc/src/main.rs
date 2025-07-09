@@ -1,11 +1,13 @@
+use emeraldc_lexer::Lexer;
 // use emeraldc_parser::ParserSource;
 use emeraldc_tokenizer::Tokenizer;
 
 fn main() {
     env_logger::init();
 
-    let source = "function name() let a = 1 end";
+    let source = "function name() let a = 1; end";
     let tokens = Tokenizer::tokenize(source);
+    let tokens = Lexer::lex(source, tokens);
     for token in tokens {
         println!("{token:?}");
     }
