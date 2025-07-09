@@ -62,8 +62,7 @@ checksum = "b05b61dc5112cbb17e4b6cd61790d9845d13888356391624cbe7e41efeac1e75"
 name = "emeraldc"
 version = "0.1.0"
 dependencies = [
- "emeraldc-lexer",
- "emeraldc-parser",
+ "emeraldc-tokenizer",
  "env_logger",
  "log",
 ]
@@ -71,9 +70,6 @@ dependencies = [
 [[package]]
 name = "emeraldc-lexer"
 version = "0.1.0"
-dependencies = [
- "log",
-]
 
 [[package]]
 name = "emeraldc-parser"
@@ -82,6 +78,14 @@ dependencies = [
  "emeraldc-lexer",
  "log",
 ]
+
+[[package]]
+name = "emeraldc-reporter"
+version = "0.1.0"
+
+[[package]]
+name = "emeraldc-tokenizer"
+version = "0.1.0"
 
 [[package]]
 name = "env_filter"

@@ -4,10 +4,12 @@ version = "0.1.0"
 edition = "2024"
 
 [workspace]
-members = ["emeraldc-lexer", "emeraldc-parser"]
+members = ["emeraldc-lexer", "emeraldc-parser", "emeraldc-reporter", "emeraldc-tokenizer"]
 
 [dependencies]
-emeraldc-lexer = { path = "emeraldc-lexer" }
-emeraldc-parser = { path = "emeraldc-parser" }
+emeraldc-tokenizer = { path = "emeraldc-tokenizer" }
+# emeraldc-lexer = { path = "emeraldc-lexer" }
+# emeraldc-parser = { path = "emeraldc-parser" }
+# emeraldc-reporter = { path = "emeraldc-reporter" }
 env_logger = { version = "0.11.8", default-features = false, features = ["auto-color"] }
 log = "0.4.27"
