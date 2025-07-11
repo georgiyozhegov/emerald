@@ -84,10 +84,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "emeraldc-reporter"
-version = "0.1.0"
-
-[[package]]
 name = "emeraldc-tokenizer"
 version = "0.1.0"
 
