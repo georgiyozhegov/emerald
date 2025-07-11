@@ -9,6 +9,6 @@ members = ["emeraldc-lexer", "emeraldc-parser", "emeraldc-tokenizer"]
 [dependencies]
 emeraldc-tokenizer = { path = "emeraldc-tokenizer" }
 emeraldc-lexer = { path = "emeraldc-lexer" }
-# emeraldc-parser = { path = "emeraldc-parser" }
+emeraldc-parser = { path = "emeraldc-parser" }
 env_logger = { version = "0.11.8", default-features = false, features = ["auto-color"] }
 log = "0.4.27"

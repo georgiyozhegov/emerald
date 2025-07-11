@@ -1,5 +1,5 @@
 use emeraldc_lexer::Lexer;
-// use emeraldc_parser::ParserSource;
+use emeraldc_parser::Parser;
 use emeraldc_tokenizer::Tokenizer;
 
 fn main() {
@@ -8,9 +8,7 @@ fn main() {
     let source = "function name() let a = 1; end";
     let tokens = Tokenizer::tokenize(source);
     let tokens = Lexer::lex(source, tokens);
-    for token in tokens {
-        println!("{token:?}");
-    }
+    let parse_tree = Parser::parse(tokens);
 
     /*
     let text = std::fs::read_to_string("source.ed").unwrap();

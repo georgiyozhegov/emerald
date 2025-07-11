@@ -63,6 +63,7 @@ name = "emeraldc"
 version = "0.1.0"
 dependencies = [
  "emeraldc-lexer",
+ "emeraldc-parser",
  "emeraldc-tokenizer",
  "env_logger",
  "log",
@@ -80,7 +81,6 @@ name = "emeraldc-parser"
 version = "0.1.0"
 dependencies = [
  "emeraldc-lexer",
- "log",
 ]
 
 [[package]]
