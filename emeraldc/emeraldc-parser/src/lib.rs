@@ -1,14 +1,14 @@
-mod parser;
-pub use parser::*;
-mod pt;
-pub use pt::*;
-mod dummy_token;
-pub use dummy_token::*;
-mod declaration_parser;
-use declaration_parser::*;
-mod statement_parser;
-use statement_parser::*;
-mod expression_parser;
-use expression_parser::*;
-mod tokenized_source;
-pub use tokenized_source::*;
+pub fn add(left: u64, right: u64) -> u64 {
+    left + right
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let result = add(2, 2);
+        assert_eq!(result, 4);
+    }
+}
