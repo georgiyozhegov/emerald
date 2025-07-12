@@ -16,12 +16,10 @@ impl WideToken {
 }
 
 /// Тип полного токена.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub enum WideTokenKind {
     Identifier,
-    FunctionKeyword,
-    EndKeyword,
-    LetKeyword,
+    Keyword(KeywordKind),
     Integer,
     OpenRound,
     CloseRound,
@@ -29,6 +27,14 @@ pub enum WideTokenKind {
     Invisible,
     /// Содержит случившуюся ошибку.
     HadError(LexerError),
+}
+
+/// Ключевое слово.
+#[derive(Debug, Clone, Copy)]
+pub enum KeywordKind {
+    Function,
+    End,
+    Let,
 }
 
 /// Отрезок, который обозначает местонахождение токена.

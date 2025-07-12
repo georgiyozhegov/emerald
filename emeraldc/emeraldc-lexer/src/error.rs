@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy)]
 pub enum LexerError {
     /// Найден неизвестный символ, который не может быть обработан.
     UnknownCharacter,
