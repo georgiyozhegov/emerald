@@ -5,10 +5,17 @@ use emeraldc_tokenizer::Tokenizer;
 fn main() {
     env_logger::init();
 
-    let source = "function name() let a = 1; end";
-    let tokens = Tokenizer::tokenize(source);
-    let tokens = Lexer::lex(source, tokens);
+    let source = std::fs::read_to_string("source.ed").unwrap();
+    let tokens = Tokenizer::tokenize(source.as_str());
+    let tokens = Lexer::lex(source.as_str(), tokens);
     let parse_tree = Parser::parse(tokens);
+    for (i, declaration) in parse_tree.enumerate() {
+        println!("------ #{i} ------");
+        match declaration {
+            Ok(node) => println!("{node:?}"),
+            Err(error) => eprintln!("ERROR {error:?}"),
+        }
+    }
 
     /*
     let text = std::fs::read_to_string("source.ed").unwrap();

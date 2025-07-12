@@ -1,4 +1,9 @@
 function main()
-    let a = 5 + 2 * 3 > 8;
-    boo let b = a + 2
+    let a = 5
+    let b = 1
+end
+
+function boo()
+    let b = 1 boo boo
+    let a = 1
 end
