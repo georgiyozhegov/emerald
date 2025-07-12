@@ -16,7 +16,7 @@ impl WideToken {
 }
 
 /// Тип полного токена.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum WideTokenKind {
     Identifier,
     Keyword(KeywordKind),
@@ -30,7 +30,7 @@ pub enum WideTokenKind {
 }
 
 /// Ключевое слово.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KeywordKind {
     Function,
     End,
