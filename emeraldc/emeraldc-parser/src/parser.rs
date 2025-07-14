@@ -1,8 +1,9 @@
-use core::str;
-
 use emeraldc_lexer::{WideToken, WideTokenKind};
 
-use crate::{error::ParserError, token_stream::TokenStream, tree};
+use crate::{
+    error::ParserError, introducer_kind::IntroducerKind,
+    token_stream::TokenStream, tree::{self, Statement},
+};
 
 pub struct Parser {
     token_stream: TokenStream,
@@ -23,6 +24,14 @@ impl Parser {
         Self { token_stream }
     }
 
+    fn introducer_kind(&mut self) -> IntroducerKind {
+        let token = self.token_stream.peek();
+        match token {
+            Ok(token) => IntroducerKind::from(token.kind),
+            Err(_) => IntroducerKind::Other,
+        }
+    }
+
     fn maybe_declaration(
         &mut self,
     ) -> Option<Result<tree::Declaration, ParserError>> {
@@ -36,12 +45,14 @@ impl Parser {
 
     fn parse_declaration(&mut self) -> Result<tree::Declaration, ParserError> {
         log::trace!("[x] declaration start");
+        assert!(self.introducer_kind() == IntroducerKind::Declaration);
         let token = self.token_stream.peek()?;
         let node = match token.kind {
             WideTokenKind::FunctionKeyword => self.parse_function(),
             _ => self.invalid_declaration_err(),
         };
         log::trace!("[x] declaration end");
+        log::trace!("[x] node: {node:#?}");
         node
     }
 
@@ -57,14 +68,14 @@ impl Parser {
         let identifier = self.parse_identifier();
         self.expect(WideTokenKind::OpenRound)?;
         self.expect(WideTokenKind::CloseRound)?;
-        let body = self.parse_function_body();
+        let body = self.parse_function_body()?;
         self.expect(WideTokenKind::EndKeyword)?;
         log::trace!("=> function end");
         Ok(tree::Declaration::Function { identifier, body })
     }
 
     fn parse_identifier(&mut self) -> Result<tree::Identifier, ParserError> {
-        log::trace!("--> identifier");
+        log::trace!("> identifier");
         match self.token_stream.next()? {
             next if next.kind == WideTokenKind::Identifier => {
                 let span = next.span;
@@ -76,15 +87,18 @@ impl Parser {
 
     fn parse_function_body(
         &mut self,
-    ) -> Vec<Result<tree::Statement, ParserError>> {
+    ) -> Result<Vec<Result<tree::Statement, ParserError>>, ParserError> {
         log::trace!("=> function body start");
         let mut body = Vec::new();
-        while !self.is_function_body_end() {
+        while self.introducer_kind() == IntroducerKind::Statement {
             let statement = self.parse_statement();
+            if statement.is_err() {
+                self.synchronize_next_statement();
+            }
             body.push(statement);
         }
         log::trace!("=> function body end");
-        body
+        Ok(body)
     }
 
     fn is_function_body_end(&mut self) -> bool {
@@ -93,26 +107,58 @@ impl Parser {
             .is_ok_and(|t| t.kind == WideTokenKind::EndKeyword)
     }
 
+    fn synchronize_next_statement(&mut self) {
+        log::trace!(">> synchronizing after an error");
+        while self.introducer_kind() != IntroducerKind::Statement
+            && !self.is_function_body_end()
+            && !self.token_stream.is_eof()
+        {
+            let token = self.token_stream.next();
+            log::trace!(
+                ">> skipped token: {:?}",
+                token.and_then(|t| Ok(t.kind))
+            );
+        }
+    }
+
     fn parse_statement(&mut self) -> Result<tree::Statement, ParserError> {
         log::trace!("==> statement start");
+        assert!(self.introducer_kind() == IntroducerKind::Statement);
         let node = match self.token_stream.peek()?.kind {
             WideTokenKind::LetKeyword => self.parse_let(),
             _ => self.unexpected_token_err(),
         };
         log::trace!("==> statement end");
+        log::trace!("==> node: {node:#?}");
         node
     }
 
     fn parse_let(&mut self) -> Result<tree::Statement, ParserError> {
+        log::trace!("--> let start");
         self.expect(WideTokenKind::LetKeyword)?;
         let identifier = self.parse_identifier();
         self.expect(WideTokenKind::Equal)?;
-        let value = self.parse_integer();
+        let value = self.parse_expression();
+        log::trace!("--> let end");
         Ok(tree::Statement::Let { identifier, value })
     }
 
+    fn parse_expression(&mut self) -> Result<tree::Expression, ParserError> {
+        log::trace!("===> expression start");
+        let node = match self.token_stream.peek()?.kind {
+            WideTokenKind::Identifier => self
+                .parse_identifier()
+                .and_then(|i| Ok(tree::Expression::Variable(i))),
+            WideTokenKind::Integer => self.parse_integer(),
+            _ => self.unexpected_token_err(),
+        };
+        log::trace!("===> expression end");
+        log::trace!("===> node: {node:#?}");
+        node
+    }
+
     fn parse_integer(&mut self) -> Result<tree::Expression, ParserError> {
-        log::trace!("--> integer");
+        log::trace!("---> integer");
         match self.token_stream.next()? {
             next if next.kind == WideTokenKind::Integer => {
                 Ok(tree::Expression::Integer(next.span))
@@ -127,7 +173,7 @@ impl Parser {
     ) -> Result<WideToken, ParserError> {
         match self.token_stream.next()? {
             next if next.kind == kind => {
-                log::trace!("--> token: {:?}", next.kind);
+                log::trace!("> token: {:?}", next.kind);
                 Ok(next)
             }
             _ => self.unexpected_token_err(),

@@ -1,9 +1,4 @@
-function main()
-    let a = 5
-    let b = 1
-end
+function main() let a = 1 let b = 1 end
 
 function boo()
-    let b = 1;
-    let a = 1
-end
+    let c = 1

@@ -26,4 +26,5 @@ pub enum Statement {
 #[derive(Debug, Clone)]
 pub enum Expression {
     Integer(Span),
+    Variable(Identifier),
 }
