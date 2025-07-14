@@ -56,17 +56,17 @@ impl<'s> Lexer<'s> {
     ) -> WideTokenKind {
         let lexeme: &str = &self.source[span.start..span.end];
         if let Some(keyword_kind) = self.maybe_keyword(lexeme) {
-            WideTokenKind::Keyword(keyword_kind)
+            keyword_kind
         } else {
             WideTokenKind::Identifier
         }
     }
 
-    fn maybe_keyword(&self, lexeme: &str) -> Option<KeywordKind> {
+    fn maybe_keyword(&self, lexeme: &str) -> Option<WideTokenKind> {
         match lexeme {
-            "function" => Some(KeywordKind::Function),
-            "end" => Some(KeywordKind::End),
-            "let" => Some(KeywordKind::Let),
+            "function" => Some(WideTokenKind::FunctionKeyword),
+            "end" => Some(WideTokenKind::EndKeyword),
+            "let" => Some(WideTokenKind::LetKeyword),
             _ => None,
         }
     }
