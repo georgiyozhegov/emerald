@@ -140,10 +140,3 @@ impl Parser {
         Err(ParserError::UnexpectedToken(previous))
     }
 }
-
-fn status_of<T, E>(result: Result<T, E>) -> &'static str {
-    match result {
-        Ok(_) => "ok",
-        Err(_) => "err",
-    }
-}
