@@ -2,7 +2,7 @@ use emeraldc_tokenizer::{Token, TokenKind};
 
 use crate::{
     LexerError,
-    wide_token::{KeywordKind, Span, WideToken, WideTokenKind},
+    wide_token::{Span, WideToken, WideTokenKind},
 };
 
 /// Лексер.
