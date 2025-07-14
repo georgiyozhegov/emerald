@@ -4,6 +4,6 @@ function main()
 end
 
 function boo()
-    let b = 1 boo boo
+    let b = 1;
     let a = 1
 end

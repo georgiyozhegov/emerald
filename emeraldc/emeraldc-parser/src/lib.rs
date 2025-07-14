@@ -1,5 +1,5 @@
-mod error;
-pub mod parse_tree;
+pub mod error;
 mod parser;
-pub use error::ParserError;
+mod token_stream;
+pub mod tree;
 pub use parser::Parser;

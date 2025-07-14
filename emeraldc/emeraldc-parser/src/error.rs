@@ -1,15 +1,9 @@
-use emeraldc_lexer::WideTokenKind;
+use emeraldc_lexer::{LexerError, WideToken};
 
 #[derive(Debug, Clone)]
 pub enum ParserError {
     UnexpectedEof,
-    UnexpectedToken {
-        expected: WideTokenKind,
-        got: WideTokenKind,
-    },
-    UnexpectedTokenStr {
-        expected: &'static str,
-        got: WideTokenKind,
-    },
-    ToDo,
+    Lexer(LexerError),
+    InvalidDeclaration(WideToken),
+    UnexpectedToken(WideToken),
 }
