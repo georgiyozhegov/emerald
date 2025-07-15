@@ -6,7 +6,7 @@ use crate::tree::ParsedNode;
 #[derive(Debug, Clone)]
 pub enum FatalParserError {
     InvalidDeclarationIntroducer,
-    InvalidDeclarationConcluder,
+    InvalidStatementIntroducer,
     CompilerBug(&'static str),
     // old errors
     UnexpectedToken,

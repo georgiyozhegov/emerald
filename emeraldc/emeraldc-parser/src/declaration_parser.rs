@@ -4,7 +4,7 @@ use emeraldc_lexer::WideTokenKind;
 
 use crate::{
     Parser,
-    error::{FatalParserError, NodeError},
+    error::FatalParserError,
     introducer_kind::IntroducerKind,
     parser::Subparser,
     tree::{Declaration, ParsedNode, Statement},
@@ -74,7 +74,8 @@ impl<'p> DeclarationParser<'p> {
     ) -> Result<Vec<ParsedNode<Statement>>, FatalParserError> {
         let mut body = Vec::new();
         while !self.is_function_body_end() {
-            todo!("parse statement");
+            let statement = self.parser.parse_statement()?;
+            body.push(statement);
         }
         Ok(body)
     }
@@ -85,29 +86,4 @@ impl<'p> DeclarationParser<'p> {
             .peek()
             .is_some_and(|t| t.kind == WideTokenKind::EndKeyword)
     }
-
-    fn synchronize(&mut self) -> Result<(), FatalParserError> {
-        while self
-            .parser
-            .tokens
-            .peek()
-            .is_some_and(|t| t.kind != WideTokenKind::EndKeyword)
-        {
-            self.parser.tokens.next();
-        }
-        match self.parser.tokens.peek().and_then(|t| Some(&t.kind)) {
-            Some(WideTokenKind::EndKeyword) => Ok(()),
-            _ => self.invalid_concluder(),
-        }
-    }
-
-    fn invalid_concluder<T>(&self) -> Result<T, FatalParserError> {
-        Err(FatalParserError::InvalidDeclarationConcluder)
-    }
-}
-
-#[derive(Debug, Clone)]
-pub enum DeclarationParserError {
-    ExpectedName,
-    Expected,
 }

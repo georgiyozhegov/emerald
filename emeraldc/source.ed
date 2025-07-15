@@ -1,2 +1,2 @@
-function name() end
-function boo() end
+function main() 
+    let a = 1
