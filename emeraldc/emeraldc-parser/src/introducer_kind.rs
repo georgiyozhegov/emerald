@@ -1,5 +1,4 @@
 use emeraldc_lexer::WideTokenKind;
-use log::trace;
 
 /// Kind of a construct introducer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

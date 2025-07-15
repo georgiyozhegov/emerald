@@ -3,12 +3,9 @@ use std::iter::Peekable;
 use emeraldc_lexer::{WideToken, WideTokenKind};
 
 use crate::{
-    declaration_parser::DeclarationParser,
-    error::{FatalParserError, NodeError, NodeResult},
-    expression_parser::ExpressionParser,
-    introducer_kind::IntroducerKind,
-    statement_parser::StatementParser,
-    tree::{self, Declaration, Expression, Identifier, ParsedNode, Statement},
+    Declaration, DeclarationParser, Expression, ExpressionParser,
+    FatalParserError, Identifier, IntroducerKind, NodeError, ParsedNode,
+    Statement, StatementParser,
 };
 
 pub struct Parser {
@@ -21,7 +18,6 @@ impl Parser {
     ) -> impl Iterator<Item = Result<ParsedNode<Declaration>, FatalParserError>>
     {
         let mut parser = Self::new(tokens);
-        log::trace!("running parser");
         std::iter::from_fn(move || {
             parser.tokens.peek()?;
             Some(parser.parse_declaration())
@@ -29,7 +25,6 @@ impl Parser {
     }
 
     fn new(tokens: impl Iterator<Item = WideToken>) -> Self {
-        log::trace!("initializing parser");
         let tokens = tokens.filter(|t| t.kind != WideTokenKind::Invisible);
         let tokens = tokens.collect::<Vec<_>>().into_iter();
         let tokens = tokens.peekable();
@@ -78,22 +73,6 @@ impl Parser {
         }
     }
 
-    fn parse_integer(
-        &mut self,
-    ) -> Result<ParsedNode<Expression>, FatalParserError> {
-        match self.tokens.next() {
-            Some(token) if token.kind == WideTokenKind::Integer => {
-                let node = Ok(Expression::Integer);
-                Ok(ParsedNode::new(node, token.span))
-            }
-            Some(token) => {
-                let error = Err(NodeError::UnexpectedToken(token.kind));
-                Ok(ParsedNode::new(error, token.span))
-            }
-            None => Err(FatalParserError::UnexpectedEof),
-        }
-    }
-
     pub(crate) fn expect(
         &mut self,
         kind: WideTokenKind,
@@ -109,24 +88,6 @@ impl Parser {
             }
             None => Err(FatalParserError::UnexpectedEof),
         }
-    }
-
-    pub(crate) fn _expect(
-        &mut self,
-        kind: WideTokenKind,
-    ) -> Result<WideToken, FatalParserError> {
-        match self.tokens.next() {
-            Some(next) if next.kind == kind => {
-                log::trace!("> token: {:?}", next.kind);
-                Ok(next)
-            }
-            _ => self.unexpected_token_err(),
-        }
-    }
-
-    fn unexpected_token_err<T>(&mut self) -> Result<T, FatalParserError> {
-        log::error!("[x] unexpected token");
-        Err(FatalParserError::UnexpectedToken)
     }
 }
 

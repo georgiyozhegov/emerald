@@ -3,11 +3,8 @@ use emeraldc_lexer::WideTokenKind;
 // i'm proud of this parser
 
 use crate::{
-    Parser,
-    error::{FatalParserError, NodeError},
-    introducer_kind::IntroducerKind,
-    parser::Subparser,
-    tree::{ParsedNode, Statement},
+    FatalParserError, IntroducerKind, NodeError, ParsedNode, Parser, Statement,
+    Subparser,
 };
 
 pub struct StatementParser<'p> {

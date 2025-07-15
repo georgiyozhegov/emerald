@@ -1,6 +1,6 @@
 use emeraldc_lexer::{Span, WideTokenKind};
 
-use crate::error::NodeError;
+use crate::NodeError;
 
 #[derive(Debug, Clone)]
 pub enum Declaration {

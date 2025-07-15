@@ -1,9 +1,14 @@
 mod declaration_parser;
-pub mod error;
+mod error;
 mod expression_parser;
 mod introducer_kind;
 mod parser;
 mod statement_parser;
-mod token_stream;
-pub mod tree;
-pub use parser::Parser;
+mod tree;
+use declaration_parser::*;
+use error::*;
+use expression_parser::*;
+use introducer_kind::*;
+pub use parser::*;
+use statement_parser::*;
+pub use tree::*;
