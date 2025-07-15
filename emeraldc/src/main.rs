@@ -10,7 +10,9 @@ fn main() {
     let tokens = Lexer::lex(source.as_str(), tokens);
     let parse_tree = Parser::parse(tokens);
     for node in parse_tree {
-        println!("{node:#?}");
+        let span = node.unwrap().span;
+        let preview = &source[span.start..span.end];
+        println!("{preview}");
     }
 
     /*
