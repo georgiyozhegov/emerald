@@ -1,7 +1,4 @@
-use crate::TokenKind;
-use crate::ch_group::ChGroup;
-use crate::source_buffer::SourceBuffer;
-use crate::token::Token;
+use crate::{ChGroup, SourceBuffer, Token, TokenKind};
 
 /// Токенизатор.
 pub struct Tokenizer<'s> {

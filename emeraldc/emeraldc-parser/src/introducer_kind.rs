@@ -19,9 +19,9 @@ impl From<&WideTokenKind> for IntroducerKind {
         match token_kind {
             WideTokenKind::FunctionKeyword => Self::Declaration,
             WideTokenKind::LetKeyword => Self::Statement,
-            WideTokenKind::Identifier | WideTokenKind::Integer => {
-                Self::Expression
-            }
+            WideTokenKind::Identifier
+            | WideTokenKind::Integer
+            | WideTokenKind::OpenRound => Self::Expression,
             _ => Self::Other,
         }
     }

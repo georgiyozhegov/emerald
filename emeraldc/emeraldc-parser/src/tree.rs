@@ -36,6 +36,11 @@ pub enum Expression {
         operator: ParsedNode<BinaryOperator>,
         right: Box<ParsedNode<Expression>>,
     },
+    Parenthesized {
+        _open_round: ParsedNode<WideTokenKind>,
+        inner: Box<ParsedNode<Expression>>,
+        _close_round: ParsedNode<WideTokenKind>,
+    },
 }
 
 #[derive(Debug, Clone)]

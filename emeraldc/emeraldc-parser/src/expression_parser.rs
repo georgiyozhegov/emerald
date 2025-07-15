@@ -101,7 +101,25 @@ impl<'p> ExpressionParser<'p> {
                     identifier.node.and_then(|n| Ok(Expression::Variable(n)));
                 Ok(ParsedNode::new(node, identifier.span))
             }
+            Some(token) if token.kind == WideTokenKind::OpenRound => {
+                self.parse_parenthesized()
+            }
             _ => Err(FatalParserError::CompilerBug("unreachable variant")),
         }
+    }
+
+    fn parse_parenthesized(
+        &mut self,
+    ) -> Result<ParsedNode<Expression>, FatalParserError> {
+        let _open_round = self.parser.expect(WideTokenKind::OpenRound)?;
+        let inner = self.parser.parse_expression()?;
+        let _close_round = self.parser.expect(WideTokenKind::CloseRound)?;
+        let span = _open_round.span.clone().join(_close_round.span.clone());
+        let node = Ok(Expression::Parenthesized {
+            _open_round,
+            inner: Box::new(inner),
+            _close_round,
+        });
+        Ok(ParsedNode::new(node, span))
     }
 }

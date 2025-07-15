@@ -1,6 +1,6 @@
 use std::str::Chars;
 
-use crate::ch_group::ChGroup;
+use crate::ChGroup;
 
 /// Удобная обёртка над строкой для токенизатора.
 pub struct SourceBuffer<'s> {

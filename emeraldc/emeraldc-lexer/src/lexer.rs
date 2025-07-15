@@ -1,9 +1,6 @@
 use emeraldc_tokenizer::{Token, TokenKind};
 
-use crate::{
-    LexerError,
-    wide_token::{Span, WideToken, WideTokenKind},
-};
+use crate::{LexerError, Span, WideToken, WideTokenKind};
 
 /// Лексер.
 ///
