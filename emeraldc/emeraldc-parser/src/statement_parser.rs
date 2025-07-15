@@ -51,16 +51,18 @@ impl<'p> StatementParser<'p> {
 
     fn parse_let(self) -> Result<ParsedNode<Statement>, FatalParserError> {
         let _introducer = self.parser.expect(WideTokenKind::LetKeyword)?;
-        let span = _introducer.span.clone(); // todo: full span
+        let introducer_span = _introducer.span.clone(); // todo: full span
         let identifier = self.parser.parse_identifier()?;
         let _equal = self.parser.expect(WideTokenKind::Equal)?;
         let value = self.parser.parse_expression()?;
+        let value_span = value.span.clone();
         let node = Ok(Statement::Let {
             _introducer,
             identifier,
             _equal,
             value,
         });
+        let span = introducer_span.join(value_span);
         Ok(ParsedNode::new(node, span))
     }
 }

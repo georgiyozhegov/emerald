@@ -41,7 +41,7 @@ impl<'p> ExpressionParser<'p> {
             }
             let operator = self.parse_binary_operator(operator)?;
             let right = self.parse_with_precedence(right_precedence)?;
-            let span = left.span.clone();
+            let span = left.span.clone().join(right.span.clone());
             let node = Ok(Expression::Binary {
                 left: Box::new(left),
                 operator,

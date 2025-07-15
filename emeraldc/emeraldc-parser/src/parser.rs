@@ -59,7 +59,6 @@ impl Parser {
     pub(crate) fn parse_identifier(
         &mut self,
     ) -> Result<ParsedNode<Identifier>, FatalParserError> {
-        log::trace!("> identifier");
         match self.tokens.next() {
             Some(token) if token.kind == WideTokenKind::Identifier => {
                 let node = Ok(Identifier);

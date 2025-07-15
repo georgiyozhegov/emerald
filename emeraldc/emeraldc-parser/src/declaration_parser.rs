@@ -50,12 +50,13 @@ impl<'p> DeclarationParser<'p> {
         mut self,
     ) -> Result<ParsedNode<Declaration>, FatalParserError> {
         let _introducer = self.parser.expect(WideTokenKind::FunctionKeyword)?;
-        let span = _introducer.span.clone();
+        let introducer_span = _introducer.span.clone();
         let identifier = self.parser.parse_identifier()?;
         let _open_round = self.parser.expect(WideTokenKind::OpenRound)?;
         let _close_round = self.parser.expect(WideTokenKind::CloseRound)?;
         let body = self.parse_function_body()?;
         let _end = self.parser.expect(WideTokenKind::EndKeyword)?;
+        let end_span = _end.span.clone();
         let node = Ok(Declaration::Function {
             _introducer,
             identifier,
@@ -64,6 +65,7 @@ impl<'p> DeclarationParser<'p> {
             body,
             _end,
         });
+        let span = introducer_span.join(end_span);
         Ok(ParsedNode::new(node, span))
     }
 

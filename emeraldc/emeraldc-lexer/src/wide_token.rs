@@ -46,4 +46,9 @@ impl Span {
     pub fn new(start: usize, end: usize) -> Self {
         Self { start, end }
     }
+
+    pub fn join(self, right: Self) -> Self {
+        assert!(self.end < right.start);
+        Self::new(self.start, right.end)
+    }
 }
