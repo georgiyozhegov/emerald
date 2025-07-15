@@ -3,11 +3,7 @@ use std::iter::Peekable;
 use emeraldc_lexer::{WideToken, WideTokenKind};
 
 use crate::{
-    declaration_parser::DeclarationParser,
-    error::{FatalParserError, NodeError, NodeResult},
-    introducer_kind::IntroducerKind,
-    statement_parser::StatementParser,
-    tree::{self, Declaration, Expression, Identifier, ParsedNode, Statement},
+    declaration_parser::DeclarationParser, error::{FatalParserError, NodeError, NodeResult}, expression_parser::ExpressionParser, introducer_kind::IntroducerKind, statement_parser::StatementParser, tree::{self, Declaration, Expression, Identifier, ParsedNode, Statement}
 };
 
 pub struct Parser {
@@ -50,7 +46,7 @@ impl Parser {
     pub(crate) fn parse_expression(
         &mut self,
     ) -> Result<ParsedNode<Expression>, FatalParserError> {
-        self.parse_integer()
+        ExpressionParser::parse(self)
     }
 
     pub(crate) fn token_introducer_kind(&mut self) -> IntroducerKind {
@@ -77,7 +73,9 @@ impl Parser {
         }
     }
 
-    fn parse_integer(&mut self) -> Result<ParsedNode<Expression>, FatalParserError> {
+    fn parse_integer(
+        &mut self,
+    ) -> Result<ParsedNode<Expression>, FatalParserError> {
         match self.tokens.next() {
             Some(token) if token.kind == WideTokenKind::Integer => {
                 let node = Ok(Expression::Integer);
