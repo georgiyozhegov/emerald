@@ -1,5 +1,7 @@
 use emeraldc_lexer::WideTokenKind;
 
+// i'm proud of this parser
+
 use crate::{
     Parser,
     error::{FatalParserError, NodeError},
