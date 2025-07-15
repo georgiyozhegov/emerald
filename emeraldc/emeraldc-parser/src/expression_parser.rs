@@ -7,7 +7,7 @@ use crate::{
     error::{FatalParserError, NodeError},
     introducer_kind::IntroducerKind,
     parser::Subparser,
-    tree::{Expression, ParsedNode, Statement},
+    tree::{BinaryOperator, Expression, ParsedNode},
 };
 
 pub struct ExpressionParser<'p> {
@@ -33,11 +33,39 @@ impl<'p> ExpressionParser<'p> {
     }
 
     fn parse_with_precedence(
-        mut self,
-        precedence: u8,
+        &mut self,
+        minimal_precedence: u8,
     ) -> Result<ParsedNode<Expression>, FatalParserError> {
-        let mut node = self.parse_primary()?;
-        Ok(node)
+        let mut left = self.parse_primary()?;
+        while let Some(operator) = self.peek_binary_operator() {
+            let (left_precedence, right_precedence) = operator.precedence();
+            if left_precedence < minimal_precedence {
+                break;
+            }
+            let operator = self.parse_binary_operator(operator)?;
+            let right = self.parse_with_precedence(right_precedence)?;
+            let span = left.span.clone();
+            let node = Ok(Expression::Binary {
+                left: Box::new(left),
+                operator,
+                right: Box::new(right),
+            });
+            left = ParsedNode::new(node, span);
+        }
+        Ok(left)
+    }
+
+    fn peek_binary_operator(&mut self) -> Option<BinaryOperator> {
+        let token = self.parser.tokens.peek();
+        token.and_then(|t| BinaryOperator::from_token(&t.kind))
+    }
+
+    fn parse_binary_operator(
+        &mut self,
+        peeked_operator: BinaryOperator,
+    ) -> Result<ParsedNode<BinaryOperator>, FatalParserError> {
+        let token = self.parser.tokens.next().unwrap();
+        Ok(ParsedNode::new(Ok(peeked_operator), token.span))
     }
 
     fn parse_primary(
@@ -71,9 +99,9 @@ impl<'p> ExpressionParser<'p> {
                 Ok(ParsedNode::new(node, token.span))
             }
             Some(token) if token.kind == WideTokenKind::Identifier => {
-                log::trace!("identifier: {:?}", self.parser.tokens.peek());
                 let identifier = self.parser.parse_identifier()?;
-                let node = identifier.node.and_then(|n| Ok(Expression::Variable(n)));
+                let node =
+                    identifier.node.and_then(|n| Ok(Expression::Variable(n)));
                 Ok(ParsedNode::new(node, identifier.span))
             }
             _ => Err(FatalParserError::CompilerBug("unreachable variant")),

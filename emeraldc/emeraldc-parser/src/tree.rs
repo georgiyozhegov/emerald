@@ -31,6 +31,38 @@ pub enum Statement {
 pub enum Expression {
     Integer,
     Variable(Identifier),
+    Binary {
+        left: Box<ParsedNode<Expression>>,
+        operator: ParsedNode<BinaryOperator>,
+        right: Box<ParsedNode<Expression>>,
+    },
+}
+
+#[derive(Debug, Clone)]
+pub enum BinaryOperator {
+    Add,
+    Subtract,
+    Multiply,
+    Divide,
+}
+
+impl BinaryOperator {
+    pub fn from_token(kind: &WideTokenKind) -> Option<Self> {
+        match kind {
+            WideTokenKind::Plus => Some(Self::Add),
+            WideTokenKind::Minus => Some(Self::Subtract),
+            WideTokenKind::Asterisk => Some(Self::Multiply),
+            WideTokenKind::Slash => Some(Self::Divide),
+            _ => None,
+        }
+    }
+
+    pub fn precedence(&self) -> (u8, u8) {
+        match self {
+            Self::Add | Self::Subtract => (1, 2),
+            Self::Multiply | Self::Divide => (3, 4),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

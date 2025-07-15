@@ -3,7 +3,12 @@ use std::iter::Peekable;
 use emeraldc_lexer::{WideToken, WideTokenKind};
 
 use crate::{
-    declaration_parser::DeclarationParser, error::{FatalParserError, NodeError, NodeResult}, expression_parser::ExpressionParser, introducer_kind::IntroducerKind, statement_parser::StatementParser, tree::{self, Declaration, Expression, Identifier, ParsedNode, Statement}
+    declaration_parser::DeclarationParser,
+    error::{FatalParserError, NodeError, NodeResult},
+    expression_parser::ExpressionParser,
+    introducer_kind::IntroducerKind,
+    statement_parser::StatementParser,
+    tree::{self, Declaration, Expression, Identifier, ParsedNode, Statement},
 };
 
 pub struct Parser {
