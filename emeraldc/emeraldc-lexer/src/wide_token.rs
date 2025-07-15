@@ -26,6 +26,10 @@ pub enum WideTokenKind {
     OpenRound,
     CloseRound,
     Equal,
+    Plus,
+    Minus,
+    Asterisk,
+    Slash,
     Invisible,
     /// Содержит случившуюся ошибку.
     HadError(LexerError),

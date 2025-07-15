@@ -29,6 +29,10 @@ pub enum TokenKind {
     OpenRound,
     CloseRound,
     Equal,
+    Plus,
+    Minus,
+    Asterisk,
+    Slash,
     Invisible,
     Unknown,
 }

@@ -86,6 +86,10 @@ impl<'s> Tokenizer<'s> {
             '(' => TokenKind::OpenRound,
             ')' => TokenKind::CloseRound,
             '=' => TokenKind::Equal,
+            '+' => TokenKind::Plus,
+            '-' => TokenKind::Minus,
+            '*' => TokenKind::Asterisk,
+            '/' => TokenKind::Slash,
             _ => TokenKind::Unknown,
         }
     }

@@ -83,6 +83,10 @@ impl<'s> Lexer<'s> {
             TokenKind::OpenRound => WideTokenKind::OpenRound,
             TokenKind::CloseRound => WideTokenKind::CloseRound,
             TokenKind::Equal => WideTokenKind::Equal,
+            TokenKind::Plus => WideTokenKind::Plus,
+            TokenKind::Minus => WideTokenKind::Minus,
+            TokenKind::Asterisk => WideTokenKind::Asterisk,
+            TokenKind::Slash => WideTokenKind::Slash,
             TokenKind::Invisible => WideTokenKind::Invisible,
             _ => unreachable!(),
         }
