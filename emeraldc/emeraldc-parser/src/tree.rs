@@ -1,30 +1,40 @@
 use emeraldc_lexer::Span;
 
-use crate::error::ParserError;
+use crate::error::NodeError;
 
 #[derive(Debug, Clone)]
 pub enum Declaration {
     Function {
-        identifier: Result<Identifier, ParserError>,
-        body: Vec<Result<Statement, ParserError>>,
+        identifier: ParsedNode<Identifier>,
+        body: Vec<ParsedNode<Statement>>,
     },
 }
 
 #[derive(Debug, Clone)]
-pub struct Identifier {
-    pub name: Span,
-}
+pub struct Identifier;
 
 #[derive(Debug, Clone)]
 pub enum Statement {
     Let {
-        identifier: Result<Identifier, ParserError>,
-        value: Result<Expression, ParserError>,
+        identifier: ParsedNode<Identifier>,
+        value: ParsedNode<Expression>,
     },
 }
 
 #[derive(Debug, Clone)]
 pub enum Expression {
-    Integer(Span),
+    Integer,
     Variable(Identifier),
+}
+
+#[derive(Debug, Clone)]
+pub struct ParsedNode<T> {
+    pub node: Result<T, NodeError>,
+    pub span: Span,
+}
+
+impl<T> ParsedNode<T> {
+    pub fn new(node: Result<T, NodeError>, span: Span) -> Self {
+        Self { node, span }
+    }
 }

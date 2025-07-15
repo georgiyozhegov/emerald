@@ -1,8 +1,7 @@
 use emeraldc_lexer::{WideToken, WideTokenKind};
 
 use crate::{
-    error::ParserError, introducer_kind::IntroducerKind,
-    token_stream::TokenStream, tree::{self, Statement},
+    declaration_parser::DeclarationParser, error::{NodeError, NodeResult, ParserError}, introducer_kind::IntroducerKind, token_stream::TokenStream, tree::{self, Declaration, Expression, ParsedNode, Statement}
 };
 
 pub struct Parser {
@@ -12,10 +11,17 @@ pub struct Parser {
 impl Parser {
     pub fn parse(
         tokens: impl Iterator<Item = WideToken>,
-    ) -> impl Iterator<Item = Result<tree::Declaration, ParserError>> {
+    ) -> impl Iterator<Item = Result<ParsedNode<Declaration>, ParserError>> {
         let mut parser = Self::new(tokens);
         log::trace!("running parser");
-        std::iter::from_fn(move || parser.maybe_declaration())
+        std::iter::from_fn(move || {
+            if parser.token_stream.is_eof() {
+                None
+            } else {
+                let declaration = DeclarationParser::parse(&mut parser);
+                Some(declaration)
+            }
+        })
     }
 
     fn new(tokens: impl Iterator<Item = WideToken>) -> Self {
@@ -157,13 +163,17 @@ impl Parser {
         node
     }
 
-    fn parse_integer(&mut self) -> Result<tree::Expression, ParserError> {
+    fn parse_integer(&mut self) -> NodeResult<Expression> {
         log::trace!("---> integer");
         match self.token_stream.next()? {
             next if next.kind == WideTokenKind::Integer => {
-                Ok(tree::Expression::Integer(next.span))
+                let node = Ok(Expression::Integer);
+                Ok(ParsedNode::new(node, next.span))
             }
-            _ => self.unexpected_token_err(),
+            next => {
+                let error = Err(NodeError::UnexpectedToken(next.kind));
+                Ok(ParsedNode::new(error, next.span))
+            }
         }
     }
 
@@ -185,4 +195,8 @@ impl Parser {
         log::error!("[x] unexpected token: {:?}", previous.kind);
         Err(ParserError::UnexpectedToken(previous))
     }
+}
+
+pub trait Subparser<'p, T> {
+    fn parse(parser: &'p mut Parser) -> Result<ParsedNode<T>, ParserError>;
 }
