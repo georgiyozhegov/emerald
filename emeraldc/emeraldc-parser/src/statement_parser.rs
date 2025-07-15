@@ -3,11 +3,7 @@ use emeraldc_lexer::WideTokenKind;
 // i'm proud of this parser
 
 use crate::{
-    Parser,
-    error::FatalParserError,
-    introducer_kind::IntroducerKind,
-    parser::Subparser,
-    tree::{Declaration, ParsedNode, Statement},
+    error::{FatalParserError, NodeError}, introducer_kind::IntroducerKind, parser::Subparser, tree::{ParsedNode, Statement}, Parser
 };
 
 pub struct StatementParser<'p> {
@@ -35,8 +31,10 @@ impl<'p> StatementParser<'p> {
         }
     }
 
-    fn invalid_introducer<T>(&mut self) -> Result<T, FatalParserError> {
-        Err(FatalParserError::InvalidStatementIntroducer)
+    fn invalid_introducer(&mut self) -> Result<ParsedNode<Statement>, FatalParserError> {
+        let token = self.parser.tokens.next().unwrap();
+        let error = Err(NodeError::InvalidStatementIntroducer(token.kind));
+        Ok(ParsedNode::new(error, token.span))
     }
 
     fn parse_unchecked(
