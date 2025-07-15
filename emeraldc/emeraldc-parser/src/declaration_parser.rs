@@ -1,8 +1,11 @@
+use emeraldc_lexer::WideTokenKind;
+
 use crate::{
     Parser,
-    error::ParserError,
+    error::{FatalParserError, NodeError},
+    introducer_kind::IntroducerKind,
     parser::Subparser,
-    tree::{Declaration, ParsedNode},
+    tree::{Declaration, ParsedNode, Statement},
 };
 
 pub struct DeclarationParser<'p> {
@@ -12,9 +15,9 @@ pub struct DeclarationParser<'p> {
 impl<'p> Subparser<'p, Declaration> for DeclarationParser<'p> {
     fn parse(
         parser: &'p mut Parser,
-    ) -> Result<ParsedNode<Declaration>, ParserError> {
+    ) -> Result<ParsedNode<Declaration>, FatalParserError> {
         let this = Self::new(parser);
-        this._parse()
+        this.parse()
     }
 }
 
@@ -23,7 +26,86 @@ impl<'p> DeclarationParser<'p> {
         Self { parser }
     }
 
-    fn _parse(mut self) -> Result<ParsedNode<Declaration>, ParserError> {
-        todo!()
+    fn parse(mut self) -> Result<ParsedNode<Declaration>, FatalParserError> {
+        match self.parser.token_introducer_kind() {
+            IntroducerKind::Declaration => self.parse_unchecked(),
+            _ => self.invalid_introducer(),
+        }
     }
+
+    fn invalid_introducer<T>(&mut self) -> Result<T, FatalParserError> {
+        Err(FatalParserError::InvalidDeclarationIntroducer)
+    }
+
+    fn parse_unchecked(
+        self,
+    ) -> Result<ParsedNode<Declaration>, FatalParserError> {
+        match self.parser.tokens.peek().unwrap().kind {
+            WideTokenKind::FunctionKeyword => self.parse_function(),
+            _ => Err(FatalParserError::CompilerBug("unreachable variant")),
+        }
+    }
+
+    fn parse_function(
+        mut self,
+    ) -> Result<ParsedNode<Declaration>, FatalParserError> {
+        let _introducer = self.parser.expect(WideTokenKind::FunctionKeyword)?;
+        let span = _introducer.span.clone();
+        let identifier = self.parser.parse_identifier()?;
+        let _open_round = self.parser.expect(WideTokenKind::OpenRound)?;
+        let _close_round = self.parser.expect(WideTokenKind::CloseRound)?;
+        let body = self.parse_function_body()?;
+        let _end = self.parser.expect(WideTokenKind::EndKeyword)?;
+        let node = Ok(Declaration::Function {
+            _introducer,
+            identifier,
+            _open_round,
+            _close_round,
+            body,
+            _end,
+        });
+        Ok(ParsedNode::new(node, span))
+    }
+
+    fn parse_function_body(
+        &mut self,
+    ) -> Result<Vec<ParsedNode<Statement>>, FatalParserError> {
+        let mut body = Vec::new();
+        while !self.is_function_body_end() {
+            todo!("parse statement");
+        }
+        Ok(body)
+    }
+
+    fn is_function_body_end(&mut self) -> bool {
+        self.parser
+            .tokens
+            .peek()
+            .is_some_and(|t| t.kind == WideTokenKind::EndKeyword)
+    }
+
+    fn synchronize(&mut self) -> Result<(), FatalParserError> {
+        while self
+            .parser
+            .tokens
+            .peek()
+            .is_some_and(|t| t.kind != WideTokenKind::EndKeyword)
+        {
+            self.parser.tokens.next();
+        }
+        match self.parser.tokens.peek().and_then(|t| Some(&t.kind)) {
+            Some(WideTokenKind::EndKeyword) => Ok(()),
+            _ => self.invalid_concluder(),
+        }
+    }
+
+    fn invalid_concluder<T>(&self) -> Result<T, FatalParserError> {
+        Err(FatalParserError::InvalidDeclarationConcluder)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum DeclarationParserError {
+    ExpectedName,
+    Expected,
 }

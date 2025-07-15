@@ -11,8 +11,8 @@ pub enum IntroducerKind {
     Other,
 }
 
-impl From<WideTokenKind> for IntroducerKind {
-    fn from(token_kind: WideTokenKind) -> Self {
+impl From<&WideTokenKind> for IntroducerKind {
+    fn from(token_kind: &WideTokenKind) -> Self {
         match token_kind {
             WideTokenKind::FunctionKeyword => Self::Declaration,
             WideTokenKind::LetKeyword => Self::Statement,

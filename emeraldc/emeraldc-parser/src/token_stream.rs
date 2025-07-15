@@ -2,13 +2,13 @@ use std::iter::Peekable;
 
 use emeraldc_lexer::{WideToken, WideTokenKind};
 
-use crate::error::ParserError;
+use crate::error::FatalParserError;
 
 /// Stream of tokens used by the parser.
 #[derive(Debug)]
 pub struct TokenStream {
     iter: Peekable<std::vec::IntoIter<WideToken>>,
-    previous: Option<Result<WideToken, ParserError>>,
+    previous: Option<Result<WideToken, FatalParserError>>,
 }
 
 impl TokenStream {
@@ -25,7 +25,7 @@ impl TokenStream {
     /// Takes the next token from the input iterator.
     ///
     /// Also, see [`Self::adapted_token`].
-    pub fn next(&mut self) -> Result<WideToken, ParserError> {
+    pub fn next(&mut self) -> Result<WideToken, FatalParserError> {
         let token = Self::adapted_token(self.iter.next());
         self.previous = Some(token.clone());
         token
@@ -36,7 +36,7 @@ impl TokenStream {
     /// If it encounters an error, it will consume the error token to avoid infinite loop.
     ///
     /// Also, see [`Self::adapted_token`].
-    pub fn peek(&mut self) -> Result<WideToken, ParserError> {
+    pub fn peek(&mut self) -> Result<WideToken, FatalParserError> {
         let token = Self::adapted_token(self.iter.peek().cloned());
         if token.is_err() {
             return self.next();
@@ -50,23 +50,27 @@ impl TokenStream {
     /// result with parser error.
     fn adapted_token(
         token: Option<WideToken>,
-    ) -> Result<WideToken, ParserError> {
+    ) -> Result<WideToken, FatalParserError> {
         let token = Self::check_eof(token)?;
         Self::map_had_error(token)
     }
 
     /// Basically, returns an error if token is none.
-    fn check_eof(option: Option<WideToken>) -> Result<WideToken, ParserError> {
+    fn check_eof(
+        option: Option<WideToken>,
+    ) -> Result<WideToken, FatalParserError> {
         match option {
             Some(token) => Ok(token),
-            None => Err(ParserError::UnexpectedEof),
+            None => Err(FatalParserError::UnexpectedEof),
         }
     }
 
     /// Maps the [`WideTokenKind::HadError`] variant to a result.
-    fn map_had_error(token: WideToken) -> Result<WideToken, ParserError> {
+    fn map_had_error(token: WideToken) -> Result<WideToken, FatalParserError> {
         match token.kind {
-            WideTokenKind::HadError(error) => Err(ParserError::Lexer(error)),
+            WideTokenKind::HadError(error) => {
+                Err(FatalParserError::Lexer(error))
+            }
             _ => Ok(token),
         }
     }
@@ -79,7 +83,7 @@ impl TokenStream {
     /// Takes the previous saved token.
     ///
     /// Cannot be called twice for the same token!
-    pub fn take_previous(&mut self) -> Result<WideToken, ParserError> {
+    pub fn take_previous(&mut self) -> Result<WideToken, FatalParserError> {
         self.previous.take().unwrap()
     }
 }

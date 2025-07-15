@@ -9,7 +9,9 @@ fn main() {
     let tokens = Tokenizer::tokenize(source.as_str());
     let tokens = Lexer::lex(source.as_str(), tokens);
     let parse_tree = Parser::parse(tokens);
-    for node in parse_tree {}
+    for node in parse_tree {
+        println!("{node:#?}");
+    }
 
     /*
     let text = std::fs::read_to_string("source.ed").unwrap();

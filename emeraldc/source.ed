@@ -1,4 +1,2 @@
-function main() let a = 1 let b = 1 end
-
-function boo()
-    let c = 1
+function name() end
+function boo() end

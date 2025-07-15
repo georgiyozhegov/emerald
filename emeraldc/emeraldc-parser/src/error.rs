@@ -1,14 +1,17 @@
-use emeraldc_lexer::{LexerError, WideToken, WideTokenKind};
+use emeraldc_lexer::{LexerError, WideTokenKind};
 
 use crate::tree::ParsedNode;
 
 /// Error that breaks parser.
 #[derive(Debug, Clone)]
-pub enum ParserError {
+pub enum FatalParserError {
+    InvalidDeclarationIntroducer,
+    InvalidDeclarationConcluder,
+    CompilerBug(&'static str),
+    // old errors
+    UnexpectedToken,
     UnexpectedEof,
     Lexer(LexerError),
-    InvalidDeclaration(WideToken),
-    UnexpectedToken(WideToken),
 }
 
 /// Error that found in a node and does not affect the whole parsing process.
@@ -17,4 +20,4 @@ pub enum NodeError {
     UnexpectedToken(WideTokenKind),
 }
 
-pub type NodeResult<T> = Result<ParsedNode<T>, ParserError>;
+pub type NodeResult<T> = Result<ParsedNode<T>, FatalParserError>;
