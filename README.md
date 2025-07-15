@@ -10,4 +10,9 @@ Emerald is a designed to be a simple programming language that saves developers'
 
 # License
 
+<div>
+    <img align="left" height="64px" src="./etc/media/cc-heart-logo.png">
+    <img align="left" height="64px" src="./etc/media/cc-by-logo.png">
+</div>
+
 Emerald is licensed under the terms of the [*CC-BY 4.0*](./etc/LICENSE.txt) license.
