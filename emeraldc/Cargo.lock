@@ -63,6 +63,7 @@ name = "emeraldc"
 version = "0.1.0"
 dependencies = [
  "emeraldc-lexer",
+ "emeraldc-parse-tree-visualizer",
  "emeraldc-parser",
  "emeraldc-tokenizer",
  "env_logger",
@@ -75,6 +76,10 @@ version = "0.1.0"
 dependencies = [
  "emeraldc-tokenizer",
 ]
+
+[[package]]
+name = "emeraldc-parse-tree-visualizer"
+version = "0.1.0"
 
 [[package]]
 name = "emeraldc-parser"
