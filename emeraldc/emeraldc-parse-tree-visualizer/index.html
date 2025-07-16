@@ -94,151 +94,16 @@
   <body>
     <main>
       <div id="source-code">
-        
+        {% for node in parse_tree %}
         <span
-          class="node keyword"
-          data-kind="keyword"
-          data-text="function"
-          >function</span
+          class="node {{ node.kind }}"
+          data-kind="{{ node.kind }}"
+          data-text="{{ node.text }}"
+          >{{ node.text }}</span
         >
-         
-        <span
-          class="node whitespace"
-          data-kind="whitespace"
-          data-text=" "
-          > </span
-        >
-         
-        <span
-          class="node identifier"
-          data-kind="identifier"
-          data-text="name"
-          >name</span
-        >
-         
-        <span
-          class="node punctuation"
-          data-kind="punctuation"
-          data-text="("
-          >(</span
-        >
-         
-        <span
-          class="node punctuation"
-          data-kind="punctuation"
-          data-text=")"
-          >)</span
-        >
-         
-        <span
-          class="node newline"
-          data-kind="newline"
-          data-text=" "
-          > </span
-        >
-        
+        {% if node.kind == "newline" %}
         <div class="newline-break"></div>
-         
-        <span
-          class="node whitespace"
-          data-kind="whitespace"
-          data-text="	"
-          >	</span
-        >
-         
-        <span
-          class="node keyword"
-          data-kind="keyword"
-          data-text="let"
-          >let</span
-        >
-         
-        <span
-          class="node whitespace"
-          data-kind="whitespace"
-          data-text=" "
-          > </span
-        >
-         
-        <span
-          class="node punctuation"
-          data-kind="punctuation"
-          data-text="="
-          >=</span
-        >
-         
-        <span
-          class="node whitespace"
-          data-kind="whitespace"
-          data-text=" "
-          > </span
-        >
-         
-        <span
-          class="node punctuation"
-          data-kind="punctuation"
-          data-text="("
-          >(</span
-        >
-         
-        <span
-          class="node integer"
-          data-kind="integer"
-          data-text="9"
-          >9</span
-        >
-         
-        <span
-          class="node whitespace"
-          data-kind="whitespace"
-          data-text=" "
-          > </span
-        >
-         
-        <span
-          class="node punctuation"
-          data-kind="punctuation"
-          data-text="+"
-          >+</span
-        >
-         
-        <span
-          class="node whitespace"
-          data-kind="whitespace"
-          data-text=" "
-          > </span
-        >
-         
-        <span
-          class="node integer"
-          data-kind="integer"
-          data-text="28"
-          >28</span
-        >
-         
-        <span
-          class="node punctuation"
-          data-kind="punctuation"
-          data-text=")"
-          >)</span
-        >
-         
-        <span
-          class="node newline"
-          data-kind="newline"
-          data-text=" "
-          > </span
-        >
-        
-        <div class="newline-break"></div>
-         
-        <span
-          class="node keyword"
-          data-kind="keyword"
-          data-text="end"
-          >end</span
-        >
-         
+        {% endif %} {% endfor %}
       </div>
       <div id="pop-up">
         <table>
