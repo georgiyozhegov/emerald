@@ -1,4 +1,5 @@
 use emeraldc_lexer::Lexer;
+use emeraldc_parse_tree_visualizer::Visualizer;
 use emeraldc_parser::Parser;
 use emeraldc_tokenizer::Tokenizer;
 
@@ -9,7 +10,8 @@ fn main() {
     let tokens = Tokenizer::tokenize(source.as_str());
     let tokens = Lexer::lex(source.as_str(), tokens);
     let parse_tree = Parser::parse(tokens);
-
+    let html = Visualizer::visualize(source.as_str(), parse_tree);
+    std::fs::write("parse-tree.html", html).unwrap();
 
     /*
     let text = std::fs::read_to_string("source.ed").unwrap();

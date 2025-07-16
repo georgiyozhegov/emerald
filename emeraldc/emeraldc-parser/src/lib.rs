@@ -6,7 +6,7 @@ mod parser;
 mod statement_parser;
 mod tree;
 use declaration_parser::*;
-use error::*;
+pub use error::*;
 use expression_parser::*;
 use introducer_kind::*;
 pub use parser::*;

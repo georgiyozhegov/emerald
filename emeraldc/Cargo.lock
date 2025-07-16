@@ -80,6 +80,9 @@ dependencies = [
 [[package]]
 name = "emeraldc-parse-tree-visualizer"
 version = "0.1.0"
+dependencies = [
+ "emeraldc-parser",
+]
 
 [[package]]
 name = "emeraldc-parser"

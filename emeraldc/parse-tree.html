@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EmeraldC Parse Tree Visualizer</title>
+    <style>
+        body { font-family: monospace; }
+        #code { position: relative; white-space: pre; }
+        .token { position: relative; }
+        .token:hover { background-color: #ffffcc; }
+        .popup {
+            position: absolute;
+            background: white;
+            border: 1px solid #ccc;
+            padding: 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 100;
+            min-width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>EmeraldC Source with Parse Tree Info</h1>
+    <div id="code"><span class="token" data-info=""></span><span class="token" data-info=""></span><span class="token" data-info=""></span><span class="token" data-info=""></span><span class="token" data-info=""></span><span class="token" data-info=""></span><span class="token" data-info=""></span><span class="token" data-info=""></span><span class="token" data-info=""></span><span class="token" data-info=""></span><span class="token" data-info=""></span><span class="token" data-info=""></span><span class="token" data-info=""></span><span class="token" data-info=""></span><span class="token" data-info=""></span><span class="token" data-info=""></span></div>
+    <div id="popup" class="popup" style="display: none;"></div>
+    <script>
+        const popup = document.getElementById('popup');
+        document.querySelectorAll('.token').forEach(el => {
+            el.addEventListener('mouseover', e => {
+                const rect = e.target.getBoundingClientRect();
+                popup.style.display = 'block';
+                popup.style.left = `${rect.left}px`;
+                popup.style.top = `${rect.bottom + window.scrollY}px`;
+                popup.innerHTML = e.target.dataset.info;
+            });
+            el.addEventListener('mouseout', () => {
+                popup.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
