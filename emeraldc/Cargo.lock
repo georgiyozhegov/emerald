@@ -175,6 +175,7 @@ dependencies = [
 name = "emeraldc-parse-tree-visualizer"
 version = "0.1.0"
 dependencies = [
+ "emeraldc-lexer",
  "emeraldc-parser",
  "serde",
  "tera",

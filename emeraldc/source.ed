@@ -1,4 +1,8 @@
 function main()
-    let a = 1 * (2 + 3)
-    let c = a / 2
+    let a = (1 + 2)
+    let b = end
+end
+
+function boo()
+    let foo = 111
 end

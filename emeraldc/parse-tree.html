@@ -1,6 +1,10 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <meta
+      name="generator"
+      content="HTML Tidy for HTML5 for Linux version 5.7.45"
+    />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Parse Tree Visualization</title>
@@ -65,16 +69,23 @@
       }
 
       .whitespace {
-        color: transparent;
+        color: #928374;
+        opacity: 50%;
       }
 
       .newline {
-        color: transparent;
+        color: #928374;
+        opacity: 50%;
       }
 
       .newline-break {
         flex-basis: 100%;
         height: 0;
+      }
+
+      .error {
+        color: #dd584a;
+        text-decoration: wavy underline;
       }
 
       #pop-up {
@@ -89,6 +100,10 @@
         box-sizing: border-box;
         opacity: 70%;
       }
+
+      #pop-up th {
+        text-align: right;
+      }
     </style>
   </head>
   <body>
@@ -99,27 +114,39 @@
           class="node keyword"
           data-kind="keyword"
           data-text="function"
+          data-message=""
           >function</span
         >
          
         <span
           class="node whitespace"
           data-kind="whitespace"
-          data-text=" "
-          > </span
+          data-text="·"
+          data-message="&lt;whitespace&gt;"
+          >·</span
         >
          
         <span
           class="node identifier"
           data-kind="identifier"
-          data-text="name"
-          >name</span
+          data-text="main"
+          data-message=""
+          >main</span
+        >
+         
+        <span
+          class="node whitespace"
+          data-kind="whitespace"
+          data-text="·"
+          data-message="&lt;whitespace&gt;"
+          >·</span
         >
          
         <span
           class="node punctuation"
           data-kind="punctuation"
           data-text="("
+          data-message=""
           >(</span
         >
          
@@ -127,14 +154,16 @@
           class="node punctuation"
           data-kind="punctuation"
           data-text=")"
+          data-message=""
           >)</span
         >
          
         <span
           class="node newline"
           data-kind="newline"
-          data-text=" "
-          > </span
+          data-text="↵"
+          data-message="&lt;newline&gt;"
+          >↵</span
         >
         
         <div class="newline-break"></div>
@@ -143,6 +172,7 @@
           class="node whitespace"
           data-kind="whitespace"
           data-text="	"
+          data-message="&lt;tab&gt;"
           >	</span
         >
          
@@ -150,84 +180,186 @@
           class="node keyword"
           data-kind="keyword"
           data-text="let"
+          data-message=""
           >let</span
         >
          
         <span
           class="node whitespace"
           data-kind="whitespace"
-          data-text=" "
-          > </span
+          data-text="·"
+          data-message="&lt;whitespace&gt;"
+          >·</span
+        >
+         
+        <span
+          class="node identifier"
+          data-kind="identifier"
+          data-text="a"
+          data-message=""
+          >a</span
+        >
+         
+        <span
+          class="node whitespace"
+          data-kind="whitespace"
+          data-text="·"
+          data-message="&lt;whitespace&gt;"
+          >·</span
         >
          
         <span
           class="node punctuation"
           data-kind="punctuation"
           data-text="="
+          data-message=""
           >=</span
         >
          
         <span
           class="node whitespace"
           data-kind="whitespace"
-          data-text=" "
-          > </span
+          data-text="·"
+          data-message="&lt;whitespace&gt;"
+          >·</span
         >
          
         <span
           class="node punctuation"
           data-kind="punctuation"
           data-text="("
+          data-message=""
           >(</span
         >
          
         <span
           class="node integer"
           data-kind="integer"
-          data-text="9"
-          >9</span
+          data-text="1"
+          data-message=""
+          >1</span
         >
          
         <span
           class="node whitespace"
           data-kind="whitespace"
-          data-text=" "
-          > </span
+          data-text="·"
+          data-message="&lt;whitespace&gt;"
+          >·</span
         >
          
         <span
           class="node punctuation"
           data-kind="punctuation"
           data-text="+"
+          data-message=""
           >+</span
         >
          
         <span
           class="node whitespace"
           data-kind="whitespace"
-          data-text=" "
-          > </span
+          data-text="·"
+          data-message="&lt;whitespace&gt;"
+          >·</span
         >
          
         <span
           class="node integer"
           data-kind="integer"
-          data-text="28"
-          >28</span
+          data-text="2"
+          data-message=""
+          >2</span
         >
          
         <span
           class="node punctuation"
           data-kind="punctuation"
           data-text=")"
+          data-message=""
           >)</span
         >
          
         <span
           class="node newline"
           data-kind="newline"
-          data-text=" "
-          > </span
+          data-text="↵"
+          data-message="&lt;newline&gt;"
+          >↵</span
+        >
+        
+        <div class="newline-break"></div>
+         
+        <span
+          class="node whitespace"
+          data-kind="whitespace"
+          data-text="	"
+          data-message="&lt;tab&gt;"
+          >	</span
+        >
+         
+        <span
+          class="node keyword"
+          data-kind="keyword"
+          data-text="let"
+          data-message=""
+          >let</span
+        >
+         
+        <span
+          class="node whitespace"
+          data-kind="whitespace"
+          data-text="·"
+          data-message="&lt;whitespace&gt;"
+          >·</span
+        >
+         
+        <span
+          class="node identifier"
+          data-kind="identifier"
+          data-text="b"
+          data-message=""
+          >b</span
+        >
+         
+        <span
+          class="node whitespace"
+          data-kind="whitespace"
+          data-text="·"
+          data-message="&lt;whitespace&gt;"
+          >·</span
+        >
+         
+        <span
+          class="node punctuation"
+          data-kind="punctuation"
+          data-text="="
+          data-message=""
+          >=</span
+        >
+         
+        <span
+          class="node whitespace"
+          data-kind="whitespace"
+          data-text="·"
+          data-message="&lt;whitespace&gt;"
+          >·</span
+        >
+         
+        <span
+          class="node error"
+          data-kind="error"
+          data-text="end"
+          data-message="unexpected token: EndKeyword"
+          >end</span
+        >
+         
+        <span
+          class="node newline"
+          data-kind="newline"
+          data-text="↵"
+          data-message="&lt;newline&gt;"
+          >↵</span
         >
         
         <div class="newline-break"></div>
@@ -236,6 +368,167 @@
           class="node keyword"
           data-kind="keyword"
           data-text="end"
+          data-message=""
+          >end</span
+        >
+         
+        <span
+          class="node newline"
+          data-kind="newline"
+          data-text="↵"
+          data-message="&lt;newline&gt;"
+          >↵</span
+        >
+        
+        <div class="newline-break"></div>
+         
+        <span
+          class="node newline"
+          data-kind="newline"
+          data-text="↵"
+          data-message="&lt;newline&gt;"
+          >↵</span
+        >
+        
+        <div class="newline-break"></div>
+         
+        <span
+          class="node keyword"
+          data-kind="keyword"
+          data-text="function"
+          data-message=""
+          >function</span
+        >
+         
+        <span
+          class="node whitespace"
+          data-kind="whitespace"
+          data-text="·"
+          data-message="&lt;whitespace&gt;"
+          >·</span
+        >
+         
+        <span
+          class="node identifier"
+          data-kind="identifier"
+          data-text="boo"
+          data-message=""
+          >boo</span
+        >
+         
+        <span
+          class="node whitespace"
+          data-kind="whitespace"
+          data-text="·"
+          data-message="&lt;whitespace&gt;"
+          >·</span
+        >
+         
+        <span
+          class="node punctuation"
+          data-kind="punctuation"
+          data-text="("
+          data-message=""
+          >(</span
+        >
+         
+        <span
+          class="node punctuation"
+          data-kind="punctuation"
+          data-text=")"
+          data-message=""
+          >)</span
+        >
+         
+        <span
+          class="node newline"
+          data-kind="newline"
+          data-text="↵"
+          data-message="&lt;newline&gt;"
+          >↵</span
+        >
+        
+        <div class="newline-break"></div>
+         
+        <span
+          class="node whitespace"
+          data-kind="whitespace"
+          data-text="	"
+          data-message="&lt;tab&gt;"
+          >	</span
+        >
+         
+        <span
+          class="node keyword"
+          data-kind="keyword"
+          data-text="let"
+          data-message=""
+          >let</span
+        >
+         
+        <span
+          class="node whitespace"
+          data-kind="whitespace"
+          data-text="·"
+          data-message="&lt;whitespace&gt;"
+          >·</span
+        >
+         
+        <span
+          class="node identifier"
+          data-kind="identifier"
+          data-text="foo"
+          data-message=""
+          >foo</span
+        >
+         
+        <span
+          class="node whitespace"
+          data-kind="whitespace"
+          data-text="·"
+          data-message="&lt;whitespace&gt;"
+          >·</span
+        >
+         
+        <span
+          class="node punctuation"
+          data-kind="punctuation"
+          data-text="="
+          data-message=""
+          >=</span
+        >
+         
+        <span
+          class="node whitespace"
+          data-kind="whitespace"
+          data-text="·"
+          data-message="&lt;whitespace&gt;"
+          >·</span
+        >
+         
+        <span
+          class="node integer"
+          data-kind="integer"
+          data-text="111"
+          data-message=""
+          >111</span
+        >
+         
+        <span
+          class="node newline"
+          data-kind="newline"
+          data-text="↵"
+          data-message="&lt;newline&gt;"
+          >↵</span
+        >
+        
+        <div class="newline-break"></div>
+         
+        <span
+          class="node keyword"
+          data-kind="keyword"
+          data-text="end"
+          data-message=""
           >end</span
         >
          
@@ -250,33 +543,45 @@
             <th>text</th>
             <td id="node-text"></td>
           </tr>
+          <tr>
+            <th>message</th>
+            <td id="node-message"></td>
+          </tr>
         </table>
       </div>
     </main>
     <script>
-      let pop_up = document.getElementById("pop-up");
-      let pop_up_node_kind = document.querySelector("#pop-up #node-kind");
-      let pop_up_node_text = document.querySelector("#pop-up #node-text");
+      const popUp = document.getElementById("pop-up");
+      const nodeKind = document.getElementById("node-kind");
+      const nodeText = document.getElementById("node-text");
+      const nodeMessage = document.getElementById("node-message");
 
-      let nodes = document.querySelectorAll(".node");
-      nodes.forEach(function(node) {
-        node.addEventListener("mouseover", popUp);
-        node.addEventListener("mouseout", popDown);
+      document.querySelectorAll(".node").forEach(function (node) {
+        node.addEventListener("mouseover", showPopUp);
+        node.addEventListener("mouseout", hidePopUp);
       });
 
-      function popUp(event) {
+      function showPopUp(event) {
         let node = event.target;
-        let data = node.dataset;
-        
-        pop_up.style.top = event.pageY + 10 + "px";
-        pop_up.style.left = event.pageX + 10 + "px";
-        pop_up_node_kind.innerHTML = data.kind;
-        pop_up_node_text.innerHTML = data.text;
-        pop_up.style.display = "block";
+        const data = node.dataset;
+        alignWithCursor(popUp, event.pageX, event.pageY, 10);
+        nodeKind.innerHTML = data.kind;
+        nodeText.innerHTML = data.text;
+        nodeMessage.innerHTML = data.message;
+        makeVisible(popUp);
       }
-      
-      function popDown(event) {
-        pop_up.style.display = "none";
+
+      function alignWithCursor(element, cursorX, cursorY, shift) {
+        element.style.left = `${cursorX + shift}px`;
+        element.style.top = `${cursorY + shift}px`;
+      }
+
+      function makeVisible(element) {
+        element.style.display = "block";
+      }
+
+      function hidePopUp(event) {
+        popUp.style.display = "none";
       }
     </script>
   </body>
