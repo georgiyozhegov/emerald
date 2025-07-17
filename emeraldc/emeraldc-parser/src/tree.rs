@@ -5,14 +5,17 @@ use crate::NodeError;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Declaration {
-    Function {
-        _introducer: ParsedNode<WideTokenKind>,
-        identifier: ParsedNode<Identifier>,
-        _open_round: ParsedNode<WideTokenKind>,
-        _close_round: ParsedNode<WideTokenKind>,
-        body: Vec<ParsedNode<Statement>>,
-        _end: ParsedNode<WideTokenKind>,
-    },
+    Function(Function),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Function {
+    pub _introducer: ParsedNode<WideTokenKind>,
+    pub identifier: ParsedNode<Identifier>,
+    pub _open_round: ParsedNode<WideTokenKind>,
+    pub _close_round: ParsedNode<WideTokenKind>,
+    pub body: Vec<ParsedNode<Statement>>,
+    pub _end: ParsedNode<WideTokenKind>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -20,28 +23,37 @@ pub struct Identifier;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Statement {
-    Let {
-        _introducer: ParsedNode<WideTokenKind>,
-        identifier: ParsedNode<Identifier>,
-        _equal: ParsedNode<WideTokenKind>,
-        value: ParsedNode<Expression>,
-    },
+    Let(Let),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Let {
+    pub _introducer: ParsedNode<WideTokenKind>,
+    pub identifier: ParsedNode<Identifier>,
+    pub _equal: ParsedNode<WideTokenKind>,
+    pub value: ParsedNode<Expression>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Expression {
     Integer,
     Variable(Identifier),
-    Binary {
-        left: Box<ParsedNode<Expression>>,
-        operator: ParsedNode<BinaryOperator>,
-        right: Box<ParsedNode<Expression>>,
-    },
-    Parenthesized {
-        _open_round: ParsedNode<WideTokenKind>,
-        inner: Box<ParsedNode<Expression>>,
-        _close_round: ParsedNode<WideTokenKind>,
-    },
+    Binary(Binary),
+    Parenthesized(Parenthesized),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Binary {
+    pub left: Box<ParsedNode<Expression>>,
+    pub operator: ParsedNode<BinaryOperator>,
+    pub right: Box<ParsedNode<Expression>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Parenthesized {
+    pub _open_round: ParsedNode<WideTokenKind>,
+    pub inner: Box<ParsedNode<Expression>>,
+    pub _close_round: ParsedNode<WideTokenKind>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

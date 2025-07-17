@@ -3,8 +3,7 @@ use emeraldc_lexer::WideTokenKind;
 // i'm proud of this parser
 
 use crate::{
-    BinaryOperator, Expression, FatalParserError, IntroducerKind, NodeError,
-    ParsedNode, Parser, Subparser,
+    Binary, BinaryOperator, Expression, FatalParserError, IntroducerKind, NodeError, Parenthesized, ParsedNode, Parser, Subparser
 };
 
 pub struct ExpressionParser<'p> {
@@ -42,11 +41,12 @@ impl<'p> ExpressionParser<'p> {
             let operator = self.parse_binary_operator(operator)?;
             let right = self.parse_with_precedence(right_precedence)?;
             let span = left.span.clone().join(right.span.clone());
-            let node = Ok(Expression::Binary {
+            let binary = Binary {
                 left: Box::new(left),
                 operator,
                 right: Box::new(right),
-            });
+            };
+            let node = Ok(Expression::Binary(binary));
             left = ParsedNode::new(node, span);
         }
         Ok(left)
@@ -115,11 +115,12 @@ impl<'p> ExpressionParser<'p> {
         let inner = self.parser.parse_expression()?;
         let _close_round = self.parser.expect(WideTokenKind::CloseRound)?;
         let span = _open_round.span.clone().join(_close_round.span.clone());
-        let node = Ok(Expression::Parenthesized {
+        let parenthesized = Parenthesized {
             _open_round,
             inner: Box::new(inner),
             _close_round,
-        });
+        };
+        let node = Ok(Expression::Parenthesized(parenthesized));
         Ok(ParsedNode::new(node, span))
     }
 }

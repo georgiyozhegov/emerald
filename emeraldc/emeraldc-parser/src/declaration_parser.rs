@@ -3,8 +3,7 @@ use emeraldc_lexer::WideTokenKind;
 // i'm proud of this parser
 
 use crate::{
-    Declaration, FatalParserError, IntroducerKind, ParsedNode, Parser,
-    Statement, Subparser,
+    Declaration, FatalParserError, Function, IntroducerKind, ParsedNode, Parser, Statement, Subparser
 };
 
 pub struct DeclarationParser<'p> {
@@ -57,14 +56,15 @@ impl<'p> DeclarationParser<'p> {
         let body = self.parse_function_body()?;
         let _end = self.parser.expect(WideTokenKind::EndKeyword)?;
         let end_span = _end.span.clone();
-        let node = Ok(Declaration::Function {
+        let function = Function {
             _introducer,
             identifier,
             _open_round,
             _close_round,
             body,
             _end,
-        });
+        };
+        let node = Ok(Declaration::Function(function));
         let span = introducer_span.join(end_span);
         Ok(ParsedNode::new(node, span))
     }
