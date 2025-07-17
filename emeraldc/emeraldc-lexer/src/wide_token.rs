@@ -1,5 +1,5 @@
 use crate::LexerError;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// Полный токен.
 ///
