@@ -1,8 +1,9 @@
 use emeraldc_lexer::{Span, WideTokenKind};
+use serde::{Serialize, Deserialize};
 
 use crate::NodeError;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Declaration {
     Function {
         _introducer: ParsedNode<WideTokenKind>,
@@ -14,10 +15,10 @@ pub enum Declaration {
     },
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Identifier;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Statement {
     Let {
         _introducer: ParsedNode<WideTokenKind>,
@@ -27,7 +28,7 @@ pub enum Statement {
     },
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Expression {
     Integer,
     Variable(Identifier),
@@ -43,7 +44,7 @@ pub enum Expression {
     },
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum BinaryOperator {
     Add,
     Subtract,
@@ -70,7 +71,7 @@ impl BinaryOperator {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ParsedNode<T> {
     pub node: Result<T, NodeError>,
     pub span: Span,

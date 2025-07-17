@@ -1,0 +1,330 @@
+[
+  {
+    "Ok": {
+      "node": {
+        "Ok": {
+          "Function": {
+            "_introducer": {
+              "node": {
+                "Ok": "FunctionKeyword"
+              },
+              "span": {
+                "start": 0,
+                "end": 8
+              }
+            },
+            "identifier": {
+              "node": {
+                "Ok": null
+              },
+              "span": {
+                "start": 9,
+                "end": 13
+              }
+            },
+            "_open_round": {
+              "node": {
+                "Ok": "OpenRound"
+              },
+              "span": {
+                "start": 13,
+                "end": 14
+              }
+            },
+            "_close_round": {
+              "node": {
+                "Ok": "CloseRound"
+              },
+              "span": {
+                "start": 14,
+                "end": 15
+              }
+            },
+            "body": [
+              {
+                "node": {
+                  "Ok": {
+                    "Let": {
+                      "_introducer": {
+                        "node": {
+                          "Ok": "LetKeyword"
+                        },
+                        "span": {
+                          "start": 20,
+                          "end": 23
+                        }
+                      },
+                      "identifier": {
+                        "node": {
+                          "Ok": null
+                        },
+                        "span": {
+                          "start": 24,
+                          "end": 25
+                        }
+                      },
+                      "_equal": {
+                        "node": {
+                          "Ok": "Equal"
+                        },
+                        "span": {
+                          "start": 26,
+                          "end": 27
+                        }
+                      },
+                      "value": {
+                        "node": {
+                          "Ok": {
+                            "Parenthesized": {
+                              "_open_round": {
+                                "node": {
+                                  "Ok": "OpenRound"
+                                },
+                                "span": {
+                                  "start": 28,
+                                  "end": 29
+                                }
+                              },
+                              "inner": {
+                                "node": {
+                                  "Ok": {
+                                    "Binary": {
+                                      "left": {
+                                        "node": {
+                                          "Ok": "Integer"
+                                        },
+                                        "span": {
+                                          "start": 29,
+                                          "end": 30
+                                        }
+                                      },
+                                      "operator": {
+                                        "node": {
+                                          "Ok": "Add"
+                                        },
+                                        "span": {
+                                          "start": 31,
+                                          "end": 32
+                                        }
+                                      },
+                                      "right": {
+                                        "node": {
+                                          "Ok": "Integer"
+                                        },
+                                        "span": {
+                                          "start": 33,
+                                          "end": 34
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                "span": {
+                                  "start": 29,
+                                  "end": 34
+                                }
+                              },
+                              "_close_round": {
+                                "node": {
+                                  "Ok": "CloseRound"
+                                },
+                                "span": {
+                                  "start": 34,
+                                  "end": 35
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "span": {
+                          "start": 28,
+                          "end": 35
+                        }
+                      }
+                    }
+                  }
+                },
+                "span": {
+                  "start": 20,
+                  "end": 35
+                }
+              },
+              {
+                "node": {
+                  "Ok": {
+                    "Let": {
+                      "_introducer": {
+                        "node": {
+                          "Ok": "LetKeyword"
+                        },
+                        "span": {
+                          "start": 40,
+                          "end": 43
+                        }
+                      },
+                      "identifier": {
+                        "node": {
+                          "Ok": null
+                        },
+                        "span": {
+                          "start": 44,
+                          "end": 45
+                        }
+                      },
+                      "_equal": {
+                        "node": {
+                          "Ok": "Equal"
+                        },
+                        "span": {
+                          "start": 46,
+                          "end": 47
+                        }
+                      },
+                      "value": {
+                        "node": {
+                          "Err": {
+                            "UnexpectedToken": "EndKeyword"
+                          }
+                        },
+                        "span": {
+                          "start": 48,
+                          "end": 51
+                        }
+                      }
+                    }
+                  }
+                },
+                "span": {
+                  "start": 40,
+                  "end": 51
+                }
+              }
+            ],
+            "_end": {
+              "node": {
+                "Ok": "EndKeyword"
+              },
+              "span": {
+                "start": 52,
+                "end": 55
+              }
+            }
+          }
+        }
+      },
+      "span": {
+        "start": 0,
+        "end": 55
+      }
+    }
+  },
+  {
+    "Ok": {
+      "node": {
+        "Ok": {
+          "Function": {
+            "_introducer": {
+              "node": {
+                "Ok": "FunctionKeyword"
+              },
+              "span": {
+                "start": 57,
+                "end": 65
+              }
+            },
+            "identifier": {
+              "node": {
+                "Ok": null
+              },
+              "span": {
+                "start": 66,
+                "end": 69
+              }
+            },
+            "_open_round": {
+              "node": {
+                "Ok": "OpenRound"
+              },
+              "span": {
+                "start": 69,
+                "end": 70
+              }
+            },
+            "_close_round": {
+              "node": {
+                "Ok": "CloseRound"
+              },
+              "span": {
+                "start": 70,
+                "end": 71
+              }
+            },
+            "body": [
+              {
+                "node": {
+                  "Ok": {
+                    "Let": {
+                      "_introducer": {
+                        "node": {
+                          "Ok": "LetKeyword"
+                        },
+                        "span": {
+                          "start": 76,
+                          "end": 79
+                        }
+                      },
+                      "identifier": {
+                        "node": {
+                          "Ok": null
+                        },
+                        "span": {
+                          "start": 80,
+                          "end": 83
+                        }
+                      },
+                      "_equal": {
+                        "node": {
+                          "Ok": "Equal"
+                        },
+                        "span": {
+                          "start": 84,
+                          "end": 85
+                        }
+                      },
+                      "value": {
+                        "node": {
+                          "Ok": "Integer"
+                        },
+                        "span": {
+                          "start": 86,
+                          "end": 89
+                        }
+                      }
+                    }
+                  }
+                },
+                "span": {
+                  "start": 76,
+                  "end": 89
+                }
+              }
+            ],
+            "_end": {
+              "node": {
+                "Ok": "EndKeyword"
+              },
+              "span": {
+                "start": 90,
+                "end": 93
+              }
+            }
+          }
+        }
+      },
+      "span": {
+        "start": 57,
+        "end": 93
+      }
+    }
+  }
+]

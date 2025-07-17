@@ -13,3 +13,4 @@ emeraldc-parser = { path = "emeraldc-parser" }
 emeraldc-parse-tree-serializer = { path = "emeraldc-parse-tree-serializer" }
 env_logger = { version = "0.11.8", default-features = false, features = ["auto-color"] }
 log = "0.4.27"
+serde_json = "1.0.140"

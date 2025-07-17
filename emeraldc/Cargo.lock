@@ -68,6 +68,7 @@ dependencies = [
  "emeraldc-tokenizer",
  "env_logger",
  "log",
+ "serde_json",
 ]
 
 [[package]]
@@ -75,17 +76,12 @@ name = "emeraldc-lexer"
 version = "0.1.0"
 dependencies = [
  "emeraldc-tokenizer",
+ "serde",
 ]
 
 [[package]]
 name = "emeraldc-parse-tree-serializer"
 version = "0.1.0"
-dependencies = [
- "emeraldc-lexer",
- "emeraldc-parser",
- "serde",
- "serde_json",
-]
 
 [[package]]
 name = "emeraldc-parser"
@@ -93,6 +89,7 @@ version = "0.1.0"
 dependencies = [
  "emeraldc-lexer",
  "log",
+ "serde",
 ]
 
 [[package]]

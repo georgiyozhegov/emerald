@@ -1,9 +1,10 @@
 use crate::LexerError;
+use serde::{Serialize, Deserialize};
 
 /// Полный токен.
 ///
 /// Содержит полный тип токена и его местонахождение.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WideToken {
     pub kind: WideTokenKind,
     pub span: Span,
@@ -16,7 +17,7 @@ impl WideToken {
 }
 
 /// Тип полного токена.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum WideTokenKind {
     Identifier,
     FunctionKeyword,
@@ -36,7 +37,7 @@ pub enum WideTokenKind {
 }
 
 /// Отрезок, который обозначает местонахождение токена.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Span {
     pub start: usize,
     pub end: usize,
