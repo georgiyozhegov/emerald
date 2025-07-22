@@ -1,9 +1,11 @@
 use emeraldc_lexer::WideTokenKind;
+use serde::de::Error;
 
 // i'm proud of this parser
 
 use crate::{
-    FatalParserError, IntroducerKind, Let, NodeError, ParsedNode, Parser, Statement, Subparser
+    FatalParserError, IntroducerKind, Let, NodeError, ParsedNode, Parser,
+    Statement, Subparser,
 };
 
 pub struct StatementParser<'p> {
@@ -34,9 +36,17 @@ impl<'p> StatementParser<'p> {
     fn invalid_introducer(
         &mut self,
     ) -> Result<ParsedNode<Statement>, FatalParserError> {
-        let token = self.parser.tokens.next().unwrap();
-        let error = Err(NodeError::InvalidStatementIntroducer(token.kind));
-        Ok(ParsedNode::new(error, token.span))
+        match self.parser.tokens.next().unwrap() {
+            token if token.kind.had_error() => {
+                let error = Err(NodeError::Lexer(token.kind.as_error()));
+                Ok(ParsedNode::new(error, token.span))
+            }
+            token => {
+                let error =
+                    Err(NodeError::InvalidStatementIntroducer(token.kind));
+                Ok(ParsedNode::new(error, token.span))
+            }
+        }
     }
 
     fn parse_unchecked(

@@ -64,6 +64,10 @@ impl Parser {
                 let node = Ok(Identifier);
                 Ok(ParsedNode::new(node, token.span))
             }
+            Some(token) if token.kind.had_error() => {
+                let error = Err(NodeError::Lexer(token.kind.as_error()));
+                Ok(ParsedNode::new(error, token.span))
+            }
             Some(token) => {
                 let error = Err(NodeError::UnexpectedToken(token.kind));
                 Ok(ParsedNode::new(error, token.span))
@@ -80,6 +84,10 @@ impl Parser {
             Some(token) if token.kind == kind => {
                 let node = Ok(token.kind);
                 Ok(ParsedNode::new(node, token.span))
+            }
+            Some(token) if token.kind.had_error() => {
+                let error = Err(NodeError::Lexer(token.kind.as_error()));
+                Ok(ParsedNode::new(error, token.span))
             }
             Some(token) => {
                 let error = Err(NodeError::UnexpectedToken(token.kind));

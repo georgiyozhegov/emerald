@@ -7,8 +7,6 @@ pub enum FatalParserError {
     InvalidDeclarationIntroducer,
     CompilerBug(&'static str),
     UnexpectedEof,
-    UnexpectedToken, // deprecate
-    Lexer(LexerError),
 }
 
 /// Error found in a node and does not affect the whole parsing process.
@@ -16,5 +14,12 @@ pub enum FatalParserError {
 pub enum NodeError {
     UnexpectedToken(WideTokenKind),
     InvalidStatementIntroducer(WideTokenKind),
-    InvalidExpressionIntroducer,
+    InvalidExpressionIntroducer(WideTokenKind),
+    Lexer(LexerError),
+}
+
+impl NodeError {
+    pub fn is_had_error(token_kind: &WideTokenKind) -> bool {
+        matches!(token_kind, WideTokenKind::HadError(_))
+    }
 }

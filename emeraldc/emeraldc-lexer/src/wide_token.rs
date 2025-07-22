@@ -36,6 +36,19 @@ pub enum WideTokenKind {
     HadError(LexerError),
 }
 
+impl WideTokenKind {
+    pub fn had_error(&self) -> bool {
+        matches!(self, Self::HadError(_))
+    }
+
+    pub fn as_error(self) -> LexerError {
+        match self {
+            Self::HadError(error) => error,
+            _ => panic!(),
+        }
+    }
+}
+
 /// Отрезок, который обозначает местонахождение токена.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Span {

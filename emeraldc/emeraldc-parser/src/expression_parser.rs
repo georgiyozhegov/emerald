@@ -3,7 +3,8 @@ use emeraldc_lexer::WideTokenKind;
 // i'm proud of this parser
 
 use crate::{
-    Binary, BinaryOperator, Expression, FatalParserError, IntroducerKind, NodeError, Parenthesized, ParsedNode, Parser, Subparser
+    Binary, BinaryOperator, Expression, FatalParserError, IntroducerKind,
+    NodeError, Parenthesized, ParsedNode, Parser, Subparser,
 };
 
 pub struct ExpressionParser<'p> {
@@ -78,8 +79,13 @@ impl<'p> ExpressionParser<'p> {
         &mut self,
     ) -> Result<ParsedNode<Expression>, FatalParserError> {
         match self.parser.tokens.next() {
+            Some(token) if token.kind.had_error() => {
+                let error = Err(NodeError::Lexer(token.kind.as_error()));
+                Ok(ParsedNode::new(error, token.span))
+            }
             Some(token) => {
-                let error = Err(NodeError::UnexpectedToken(token.kind));
+                let error =
+                    Err(NodeError::InvalidExpressionIntroducer(token.kind));
                 Ok(ParsedNode::new(error, token.span))
             }
             None => Err(FatalParserError::UnexpectedEof),
