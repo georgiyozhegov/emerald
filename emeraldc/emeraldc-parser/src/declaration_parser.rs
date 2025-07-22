@@ -33,8 +33,8 @@ impl<'p> DeclarationParser<'p> {
     }
 
     fn invalid_introducer<T>(&mut self) -> Result<T, FatalParserError> {
-        self.parser.tokens.next();
-        Err(FatalParserError::InvalidDeclarationIntroducer)
+        let token = self.parser.tokens.next().unwrap();
+        Err(FatalParserError::InvalidDeclarationIntroducer(token.kind))
     }
 
     fn parse_unchecked(
