@@ -1,0 +1,94 @@
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 14px;
+    padding: 1rem;
+  }
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: #252526;
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+  #tree-window {
+    white-space: pre;
+  }
+
+  /* Base parsed node */
+  .pt-parsed-node {
+    display: block;
+    margin-left: 0;
+    user-select: text;
+  }
+  /* Indent nested parsed nodes */
+  .pt-parsed-node > .pt-parsed-node {
+    margin-left: 1.5em;
+  }
+  /* Expand/collapse arrow in front of first child element */
+  .pt-parsed-node.has-children > :first-child {
+    cursor: pointer;
+    position: relative;
+    padding-left: 1.2em;
+  }
+  .pt-parsed-node.has-children > :first-child::before {
+    content: '▶';
+    color: #ccc;
+    position: absolute;
+    left: 0;
+    top: 0;
+    line-height: 1;
+    transition: transform 0.2s ease;
+  }
+  .pt-parsed-node.has-children.expanded > :first-child::before {
+    content: '▼';
+  }
+  .pt-parsed-node.has-children:not(.expanded) > :not(:first-child) {
+    display: none;
+  }
+
+  /* Token colors */
+  .pt-token[data-kind="FunctionKeyword"], .pt-token[data-kind="LetKeyword"], .pt-token[data-kind="EndKeyword"] {
+    color: #569CD6;
+    font-weight: 700;
+  }
+  .pt-identifier {
+    color: #9cdcfe;
+  }
+  .pt-integer {
+    color: #b5cea8;
+  }
+  .pt-binary-operator[data-operator="Add"] {
+    color: #d4d4d4;
+    font-weight: 700;
+  }
+
+  /* Errors */
+  .pt-node-error {
+    color: #f44747;
+    border-left: 3px solid #f44747;
+    padding-left: 4px;
+    font-style: italic;
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+  }
+  .pt-fatal-error {
+    color: #fff;
+    background-color: #a31515;
+    font-weight: 700;
+    padding: 0.15em 0.3em;
+    border-radius: 3px;
+    margin-top: 0.5em;
+    display: inline-block;
+  }
+
+  /* Highlight hover */
+  .pt-parsed-node:hover {
+    background-color: rgba(100, 100, 100, 0.15);
+    border-radius: 3px;
+  }

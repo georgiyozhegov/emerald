@@ -1,11 +1,9 @@
-use std::convert::identity;
-
 use emeraldc_lexer::{Span, WideTokenKind};
 use emeraldc_parser::{
     Binary, BinaryOperator, Declaration, Expression, FatalParserError,
     Function, Identifier, Let, NodeError, Parenthesized, ParsedNode, Statement,
 };
-use maud::Render;
+use maud::{PreEscaped, Render};
 
 pub struct Visualizer<'s> {
     source: &'s str,
@@ -21,7 +19,8 @@ impl<'s> Visualizer<'s> {
         let mut visualizer = Self::new(source);
         let tree = visualizer.visualize_tree(tree);
         let tree_window = visualizer.visualize_tree_window(tree);
-        visualizer.visualize_page(tree_window)
+        let page = visualizer.visualize_page(tree_window);
+        page.into_string()
     }
 
     fn new(source: &'s str) -> Self {
@@ -33,27 +32,29 @@ impl<'s> Visualizer<'s> {
         tree: impl Iterator<
             Item = Result<ParsedNode<Declaration>, FatalParserError>,
         >,
-    ) -> maud::PreEscaped<String> {
-        let mut buffer = String::new();
-        for declaration in tree {
-            declaration.visualize(self).render_to(&mut buffer);
+    ) -> maud::Markup {
+        maud::html! {
+            @for declaration in tree {
+                (declaration.visualize(self))
+            }
         }
-        maud::PreEscaped(buffer)
     }
 
     fn visualize_tree_window(
         &mut self,
         tree: maud::PreEscaped<String>,
-    ) -> maud::PreEscaped<String> {
+    ) -> maud::Markup {
         maud::html! {
             div id="tree-window" {
                 (tree)
             }
         }
-        .render()
     }
 
-    fn visualize_page(&mut self, tree_window: impl maud::Render) -> String {
+    fn visualize_page(
+        &mut self,
+        tree_window: impl maud::Render,
+    ) -> maud::Markup {
         maud::html! {
             (maud::DOCTYPE)
             html {
@@ -61,15 +62,24 @@ impl<'s> Visualizer<'s> {
                     meta charset="utf-8";
                     meta name="author" content="Georgiy Ozhegov";
                     title { "Parse Tree Visualization" }
+                    style { (self.style()) }
                 }
                 body {
                     main {
                         (tree_window)
+                        script { (self.script()) }
                     }
                 }
             }
         }
-        .into_string()
+    }
+
+    fn style(&self) -> &str {
+        include_str!("../style.css")
+    }
+
+    fn script(&self) -> &str {
+        include_str!("../script.js")
     }
 
     pub fn text_of(&self, span: &Span) -> &'s str {
@@ -78,21 +88,20 @@ impl<'s> Visualizer<'s> {
 }
 
 trait Visualize {
-    fn visualize(self, v: &Visualizer) -> Box<dyn maud::Render>;
+    fn visualize(self, v: &Visualizer) -> maud::Markup;
 }
 
 impl Visualize for Result<ParsedNode<Declaration>, FatalParserError> {
-    fn visualize(self, v: &Visualizer) -> Box<dyn maud::Render> {
+    fn visualize(self, v: &Visualizer) -> maud::Markup {
         let inner = match self {
             Ok(node) => node.visualize(v),
             Err(error) => error.visualize(v),
         };
-        let element = maud::html! {
-            div class="node" {
+        maud::html! {
+            div class="pt-node" {
                 (inner)
             }
-        };
-        Box::new(element)
+        }
     }
 }
 
@@ -100,38 +109,36 @@ impl<V> Visualize for ParsedNode<V>
 where
     V: Visualize,
 {
-    fn visualize(self, v: &Visualizer) -> Box<dyn maud::Render> {
+    fn visualize(self, v: &Visualizer) -> maud::Markup {
         let inner = match self.node {
             Ok(node) => node.visualize(v),
             Err(error) => error.visualize(v),
         };
-        let element = maud::html! {
-            div class="parsed-node" data-span-start=(self.span.start) data-span-end=(self.span.end) data-text=(v.text_of(&self.span)) {
+        maud::html! {
+            div class="pt-parsed-node" data-span-start=(self.span.start) data-span-end=(self.span.end) data-text=(v.text_of(&self.span)) {
                 (inner)
             }
-        };
-        Box::new(element)
+        }
     }
 }
 
 impl Visualize for Declaration {
-    fn visualize(self, v: &Visualizer) -> Box<dyn maud::Render> {
+    fn visualize(self, v: &Visualizer) -> maud::Markup {
         let inner = match self {
             Self::Function(function) => function.visualize(v),
         };
-        let element = maud::html! {
-            div class="declaration" {
+        maud::html! {
+            div class="pt-declaration" {
                 (inner)
             }
-        };
-        Box::new(element)
+        }
     }
 }
 
 impl Visualize for Function {
-    fn visualize(self, v: &Visualizer) -> Box<dyn maud::Render> {
-        let element = maud::html! {
-            div class="function"{
+    fn visualize(self, v: &Visualizer) -> maud::Markup {
+        maud::html! {
+            div class="pt-function"{
                 (self._introducer.visualize(v))
                 (self.identifier.visualize(v))
                 (self._open_round.visualize(v))
@@ -139,143 +146,128 @@ impl Visualize for Function {
                 (self.body.visualize(v))
                 (self._end.visualize(v))
             }
-        };
-        Box::new(element)
+        }
     }
 }
 
 impl Visualize for Vec<ParsedNode<Statement>> {
-    fn visualize(self, v: &Visualizer) -> Box<dyn maud::Render> {
-        let mut inner = String::new();
-        for statement in self {
-            statement.visualize(v).render_to(&mut inner);
-        }
-        let element = maud::html! {
-            div class="function-body" {
-                (maud::PreEscaped(inner))
+    fn visualize(self, v: &Visualizer) -> maud::Markup {
+        maud::html! {
+            div class="pt-function-body" {
+                @for statement in self {
+                    (statement.visualize(v))
+                }
             }
-        };
-        Box::new(element)
+        }
     }
 }
 
 impl Visualize for Statement {
-    fn visualize(self, v: &Visualizer) -> Box<dyn maud::Render> {
+    fn visualize(self, v: &Visualizer) -> maud::Markup {
         let inner = match self {
             Self::Let(let_) => let_.visualize(v),
         };
-        let element = maud::html! {
-            div class="statement" {
+        maud::html! {
+            div class="pt-statement" {
                 (inner)
             }
-        };
-        Box::new(element)
+        }
     }
 }
 
 impl Visualize for Let {
-    fn visualize(self, v: &Visualizer) -> Box<dyn maud::Render> {
-        let element = maud::html! {
-            div class="let" {
+    fn visualize(self, v: &Visualizer) -> maud::Markup {
+        maud::html! {
+            div class="pt-let" {
                 (self._introducer.visualize(v))
                 (self.identifier.visualize(v))
                 (self._equal.visualize(v))
                 (self.value.visualize(v))
             }
-        };
-        Box::new(element)
+        }
     }
 }
 
 impl Visualize for Expression {
-    fn visualize(self, v: &Visualizer) -> Box<dyn maud::Render> {
+    fn visualize(self, v: &Visualizer) -> maud::Markup {
         let inner = match self {
             Self::Integer => {
-                let element = maud::html! {
-                    div class="integer" {}
-                };
-                Box::new(element)
+                maud::html! {
+                    div class="pt-integer" {}
+                }
             }
             Self::Variable(identifier) => identifier.visualize(v),
             Self::Binary(binary) => binary.visualize(v),
             Self::Parenthesized(parenthesized) => parenthesized.visualize(v),
         };
-        let element = maud::html! {
-            div class="expression" {
+        maud::html! {
+            div class="pt-expression" {
                 (inner)
             }
-        };
-        Box::new(element)
+        }
     }
 }
 
 impl Visualize for Binary {
-    fn visualize(self, v: &Visualizer) -> Box<dyn maud::Render> {
-        let element = maud::html! {
-            div class="binary" {
+    fn visualize(self, v: &Visualizer) -> maud::Markup {
+        maud::html! {
+            div class="pt-binary" {
                 (self.left.visualize(v))
                 (self.operator.visualize(v))
                 (self.right.visualize(v))
             }
-        };
-        Box::new(element)
+        }
     }
 }
 
 impl Visualize for BinaryOperator {
-    fn visualize(self, _v: &Visualizer) -> Box<dyn maud::Render> {
-        let element = maud::html! {
-            div class="binary-operator" data-operator=(format!("{self:?}")) {}
-        };
-        Box::new(element)
+    fn visualize(self, _v: &Visualizer) -> maud::Markup {
+        maud::html! {
+            div class="pt-binary-operator" data-operator=(format!("{self:?}")) {}
+        }
     }
 }
 
 impl Visualize for Parenthesized {
-    fn visualize(self, v: &Visualizer) -> Box<dyn maud::Render> {
-        let element = maud::html! {
-            div class="parenthesized" {
+    fn visualize(self, v: &Visualizer) -> maud::Markup {
+        maud::html! {
+            div class="pt-parenthesized" {
                 (self._open_round.visualize(v))
                 (self.inner.visualize(v))
                 (self._close_round.visualize(v))
             }
-        };
-        Box::new(element)
+        }
     }
 }
 
 impl Visualize for Identifier {
-    fn visualize(self, _v: &Visualizer) -> Box<dyn maud::Render> {
-        let element = maud::html! {
-            div class="identifier" {}
-        };
-        Box::new(element)
+    fn visualize(self, _v: &Visualizer) -> maud::Markup {
+        maud::html! {
+            div class="pt-identifier" {}
+        }
     }
 }
 
 impl Visualize for WideTokenKind {
-    fn visualize(self, _v: &Visualizer) -> Box<dyn maud::Render> {
-        let element = maud::html! {
-            div class="token" data-kind=(format!("{self:?}")) {}
-        };
-        Box::new(element)
+    fn visualize(self, _v: &Visualizer) -> maud::Markup {
+        maud::html! {
+            div class="pt-token" data-kind=(format!("{self:?}")) {}
+        }
     }
 }
 
 impl Visualize for NodeError {
-    fn visualize(self, _v: &Visualizer) -> Box<dyn maud::Render> {
-        let element = maud::html! {
-            div class="node-error" data-message=(self) {}
-        };
-        Box::new(element)
+    fn visualize(self, _v: &Visualizer) -> maud::Markup {
+        maud::html! {
+            div class="pt-node-error" data-message=(self) {}
+        }
     }
 }
 
 impl Visualize for FatalParserError {
-    fn visualize(self, _v: &Visualizer) -> Box<dyn maud::Render> {
-        let element = maud::html! {
-            div class="fatal-error" data-message=(self) {}
-        };
-        Box::new(element)
+    fn visualize(self, _v: &Visualizer) -> maud::Markup {
+        maud::html! {
+            div class="pt-fatal-error" data-message=(self) {}
+        }
     }
 }
