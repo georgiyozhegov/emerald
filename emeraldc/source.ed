@@ -4,5 +4,4 @@ function main()
 end
 
 function boo()
-    let foo = 111
-end
+    let foo = 23

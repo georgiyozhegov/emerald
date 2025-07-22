@@ -1,5 +1,4 @@
 use emeraldc_lexer::WideTokenKind;
-use serde::de::Error;
 
 // i'm proud of this parser
 
@@ -36,16 +35,17 @@ impl<'p> StatementParser<'p> {
     fn invalid_introducer(
         &mut self,
     ) -> Result<ParsedNode<Statement>, FatalParserError> {
-        match self.parser.tokens.next().unwrap() {
-            token if token.kind.had_error() => {
+        match self.parser.tokens.next() {
+            Some(token) if token.kind.had_error() => {
                 let error = Err(NodeError::Lexer(token.kind.as_error()));
                 Ok(ParsedNode::new(error, token.span))
             }
-            token => {
+            Some(token) => {
                 let error =
                     Err(NodeError::InvalidStatementIntroducer(token.kind));
                 Ok(ParsedNode::new(error, token.span))
             }
+            None => Err(FatalParserError::UnexpectedEof),
         }
     }
 
