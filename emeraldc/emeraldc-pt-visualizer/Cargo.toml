@@ -1,0 +1,9 @@
+[package]
+name = "emeraldc-pt-visualizer"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+emeraldc-parser = { path = "../emeraldc-parser" }
+emeraldc-lexer = { path = "../emeraldc-lexer" }
+maud = "0.27.0"
