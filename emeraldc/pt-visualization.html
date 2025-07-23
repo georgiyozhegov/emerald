@@ -1,4 +1,184 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="author" content="Georgiy Ozhegov"><title>Parse Tree Visualization</title></head><body><main><div id="tree-window"><div class="node"><div class="parsed-node" data-span-start="0" data-span-end="56" data-text="function main()
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="author" content="Georgiy Ozhegov"><title>Parse Tree Visualization</title><style>/* style.css */
+.pt-node {
+  margin: 5px 0;
+  padding: 5px;
+  border-radius: 3px;
+  font-family: monospace;
+}
+
+.pt-container {
+  border-left: 2px solid #ddd;
+  padding-left: 15px;
+  margin-left: 5px;
+}
+
+.pt-toggle {
+  cursor: pointer;
+  display: inline-block;
+  width: 15px;
+  text-align: center;
+  margin-right: 5px;
+  user-select: none;
+}
+
+.pt-collapsed &gt; .pt-children {
+  display: none;
+}
+
+.pt-parsed-node {
+  padding: 3px;
+  margin: 2px 0;
+  border-radius: 3px;
+  cursor: default;
+}
+
+.pt-parsed-node:hover {
+  background-color: #f0f7ff;
+}
+
+.pt-node-error, .pt-fatal-error {
+  color: #c00;
+  font-weight: bold;
+}
+
+.pt-token, .pt-identifier, .pt-integer, .pt-binary-operator {
+  background-color: #f5f5f5;
+  padding: 2px 5px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.pt-function, .pt-declaration, .pt-let, .pt-binary, .pt-parenthesized {
+  background-color: #e6f7ff;
+  padding: 5px;
+  border-radius: 3px;
+}
+
+.pt-tooltip {
+  position: fixed;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  z-index: 1000;
+  max-width: 400px;
+  font-family: sans-serif;
+}
+
+.pt-tooltip-header {
+  font-weight: bold;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+
+.pt-tooltip-content {
+  font-size: 14px;
+}
+
+.pt-tooltip-text {
+  font-family: monospace;
+  background: #f9f9f9;
+  padding: 5px;
+  border-radius: 3px;
+  margin: 5px 0;
+}
+</style></head><body><main><div id="tree-window"><div class="pt-node"><div class="pt-parsed-node" data-span-start="0" data-span-end="56" data-text="function main()
     let a = (1 + 2);
     let b = end
-end"><div class="declaration"><div class="function"><div class="parsed-node" data-span-start="0" data-span-end="8" data-text="function"><div class="token" data-kind="FunctionKeyword"></div></div><div class="parsed-node" data-span-start="9" data-span-end="13" data-text="main"><div class="identifier"></div></div><div class="parsed-node" data-span-start="13" data-span-end="14" data-text="("><div class="token" data-kind="OpenRound"></div></div><div class="parsed-node" data-span-start="14" data-span-end="15" data-text=")"><div class="token" data-kind="CloseRound"></div></div><div class="function-body"><div class="parsed-node" data-span-start="20" data-span-end="35" data-text="let a = (1 + 2)"><div class="statement"><div class="let"><div class="parsed-node" data-span-start="20" data-span-end="23" data-text="let"><div class="token" data-kind="LetKeyword"></div></div><div class="parsed-node" data-span-start="24" data-span-end="25" data-text="a"><div class="identifier"></div></div><div class="parsed-node" data-span-start="26" data-span-end="27" data-text="="><div class="token" data-kind="Equal"></div></div><div class="parsed-node" data-span-start="28" data-span-end="35" data-text="(1 + 2)"><div class="expression"><div class="parenthesized"><div class="parsed-node" data-span-start="28" data-span-end="29" data-text="("><div class="token" data-kind="OpenRound"></div></div><div class="parsed-node" data-span-start="29" data-span-end="34" data-text="1 + 2"><div class="expression"><div class="binary"><div class="parsed-node" data-span-start="29" data-span-end="30" data-text="1"><div class="expression"><div class="integer"></div></div></div><div class="parsed-node" data-span-start="31" data-span-end="32" data-text="+"><div class="binary-operator" data-operator="Add"></div></div><div class="parsed-node" data-span-start="33" data-span-end="34" data-text="2"><div class="expression"><div class="integer"></div></div></div></div></div></div><div class="parsed-node" data-span-start="34" data-span-end="35" data-text=")"><div class="token" data-kind="CloseRound"></div></div></div></div></div></div></div></div><div class="parsed-node" data-span-start="35" data-span-end="36" data-text=";"><div class="node-error" data-message="found an unknown character"></div></div><div class="parsed-node" data-span-start="41" data-span-end="52" data-text="let b = end"><div class="statement"><div class="let"><div class="parsed-node" data-span-start="41" data-span-end="44" data-text="let"><div class="token" data-kind="LetKeyword"></div></div><div class="parsed-node" data-span-start="45" data-span-end="46" data-text="b"><div class="identifier"></div></div><div class="parsed-node" data-span-start="47" data-span-end="48" data-text="="><div class="token" data-kind="Equal"></div></div><div class="parsed-node" data-span-start="49" data-span-end="52" data-text="end"><div class="node-error" data-message="invalid expression introducer: EndKeyword"></div></div></div></div></div></div><div class="parsed-node" data-span-start="53" data-span-end="56" data-text="end"><div class="token" data-kind="EndKeyword"></div></div></div></div></div></div><div class="node"><div class="fatal-error" data-message="unexpected eof"></div></div></div></main></body></html>
+end"><div class="pt-declaration"><div class="pt-function"><div class="pt-parsed-node" data-span-start="0" data-span-end="8" data-text="function"><div class="pt-token" data-kind="FunctionKeyword"></div></div><div class="pt-parsed-node" data-span-start="9" data-span-end="13" data-text="main"><div class="pt-identifier"></div></div><div class="pt-parsed-node" data-span-start="13" data-span-end="14" data-text="("><div class="pt-token" data-kind="OpenRound"></div></div><div class="pt-parsed-node" data-span-start="14" data-span-end="15" data-text=")"><div class="pt-token" data-kind="CloseRound"></div></div><div class="pt-function-body"><div class="pt-parsed-node" data-span-start="20" data-span-end="35" data-text="let a = (1 + 2)"><div class="pt-statement"><div class="pt-let"><div class="pt-parsed-node" data-span-start="20" data-span-end="23" data-text="let"><div class="pt-token" data-kind="LetKeyword"></div></div><div class="pt-parsed-node" data-span-start="24" data-span-end="25" data-text="a"><div class="pt-identifier"></div></div><div class="pt-parsed-node" data-span-start="26" data-span-end="27" data-text="="><div class="pt-token" data-kind="Equal"></div></div><div class="pt-parsed-node" data-span-start="28" data-span-end="35" data-text="(1 + 2)"><div class="pt-expression"><div class="pt-parenthesized"><div class="pt-parsed-node" data-span-start="28" data-span-end="29" data-text="("><div class="pt-token" data-kind="OpenRound"></div></div><div class="pt-parsed-node" data-span-start="29" data-span-end="34" data-text="1 + 2"><div class="pt-expression"><div class="pt-binary"><div class="pt-parsed-node" data-span-start="29" data-span-end="30" data-text="1"><div class="pt-expression"><div class="pt-integer"></div></div></div><div class="pt-parsed-node" data-span-start="31" data-span-end="32" data-text="+"><div class="pt-binary-operator" data-operator="Add"></div></div><div class="pt-parsed-node" data-span-start="33" data-span-end="34" data-text="2"><div class="pt-expression"><div class="pt-integer"></div></div></div></div></div></div><div class="pt-parsed-node" data-span-start="34" data-span-end="35" data-text=")"><div class="pt-token" data-kind="CloseRound"></div></div></div></div></div></div></div></div><div class="pt-parsed-node" data-span-start="35" data-span-end="36" data-text=";"><div class="pt-node-error" data-message="found an unknown character"></div></div><div class="pt-parsed-node" data-span-start="41" data-span-end="52" data-text="let b = end"><div class="pt-statement"><div class="pt-let"><div class="pt-parsed-node" data-span-start="41" data-span-end="44" data-text="let"><div class="pt-token" data-kind="LetKeyword"></div></div><div class="pt-parsed-node" data-span-start="45" data-span-end="46" data-text="b"><div class="pt-identifier"></div></div><div class="pt-parsed-node" data-span-start="47" data-span-end="48" data-text="="><div class="pt-token" data-kind="Equal"></div></div><div class="pt-parsed-node" data-span-start="49" data-span-end="52" data-text="end"><div class="pt-node-error" data-message="invalid expression introducer: EndKeyword"></div></div></div></div></div></div><div class="pt-parsed-node" data-span-start="53" data-span-end="56" data-text="end"><div class="pt-token" data-kind="EndKeyword"></div></div></div></div></div></div><div class="pt-node"><div class="pt-fatal-error" data-message="unexpected eof"></div></div></div><script>// script.js
+document.addEventListener('DOMContentLoaded', () =&gt; {
+  // Add toggle buttons to collapsible nodes
+  const containers = document.querySelectorAll('.pt-function, .pt-function-body, .pt-binary, .pt-parenthesized, .pt-let');
+  
+  containers.forEach(container =&gt; {
+    const toggle = document.createElement('span');
+    toggle.className = 'pt-toggle';
+    toggle.textContent = '▼';
+    container.insertBefore(toggle, container.firstChild);
+    container.classList.add('pt-container');
+    
+    const children = Array.from(container.children).filter(
+      el =&gt; !el.classList.contains('pt-toggle')
+    );
+    
+    if (children.length &gt; 0) {
+      const childrenWrapper = document.createElement('div');
+      childrenWrapper.className = 'pt-children';
+      children.forEach(child =&gt; childrenWrapper.appendChild(child.cloneNode(true)));
+      
+      container.appendChild(childrenWrapper);
+      children.forEach(child =&gt; child.remove());
+    }
+  });
+
+  // Handle toggle clicks
+  document.querySelectorAll('.pt-toggle').forEach(toggle =&gt; {
+    toggle.addEventListener('click', () =&gt; {
+      const container = toggle.parentElement;
+      container.classList.toggle('pt-collapsed');
+      toggle.textContent = container.classList.contains('pt-collapsed') ? '▶' : '▼';
+    });
+  });
+
+  // Create tooltip element
+  const tooltip = document.createElement('div');
+  tooltip.className = 'pt-tooltip';
+  tooltip.style.display = 'none';
+  document.body.appendChild(tooltip);
+
+  // Show tooltip on node hover
+  document.querySelectorAll('.pt-parsed-node').forEach(node =&gt; {
+    node.addEventListener('mouseenter', (e) =&gt; {
+      const rect = node.getBoundingClientRect();
+      tooltip.style.left = `${rect.right + 10}px`;
+      tooltip.style.top = `${rect.top}px`;
+      tooltip.style.display = 'block';
+      
+      const spanStart = node.dataset.spanStart;
+      const spanEnd = node.dataset.spanEnd;
+      const text = node.dataset.text || '';
+      
+      let content = `
+        &lt;div class=&quot;pt-tooltip-header&quot;&gt;Node Information&lt;/div&gt;
+        &lt;div class=&quot;pt-tooltip-content&quot;&gt;
+          &lt;div&gt;&lt;strong&gt;Span:&lt;/strong&gt; ${spanStart} - ${spanEnd}&lt;/div&gt;
+          &lt;div class=&quot;pt-tooltip-text&quot;&gt;${escapeHtml(text)}&lt;/div&gt;
+      `;
+      
+      // Add error info if exists
+      const error = node.querySelector('.pt-node-error, .pt-fatal-error');
+      if (error) {
+        content += `&lt;div&gt;&lt;strong&gt;Error:&lt;/strong&gt; ${error.dataset.message || ''}&lt;/div&gt;`;
+      }
+      
+      // Add node type
+      const type = Array.from(node.classList).find(cls =&gt; 
+        cls.startsWith('pt-') &amp;&amp; 
+        !['pt-parsed-node', 'pt-container', 'pt-collapsed'].includes(cls)
+      );
+      if (type) {
+        content += `&lt;div&gt;&lt;strong&gt;Type:&lt;/strong&gt; ${type.replace('pt-', '')}&lt;/div&gt;`;
+      }
+      
+      content += `&lt;/div&gt;`;
+      tooltip.innerHTML = content;
+    });
+
+    node.addEventListener('mouseleave', () =&gt; {
+      tooltip.style.display = 'none';
+    });
+  });
+});
+
+// Helper function to escape HTML
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&amp;/g, &quot;&amp;amp;&quot;)
+    .replace(/&lt;/g, &quot;&amp;lt;&quot;)
+    .replace(/&gt;/g, &quot;&amp;gt;&quot;)
+    .replace(/&quot;/g, &quot;&amp;quot;&quot;)
+    .replace(/'/g, &quot;&amp;#039;&quot;);
+}
+</script></main></body></html>
