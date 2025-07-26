@@ -1,4 +1,5 @@
-use emeraldc_lexer::{Span, WideTokenKind};
+use emeraldc_lexer::WideTokenKind;
+use emeraldc_span::Span;
 use serde::{Deserialize, Serialize};
 
 use crate::NodeError;

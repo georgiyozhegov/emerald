@@ -1,6 +1,7 @@
 use emeraldc_tokenizer::{Token, TokenKind};
+use emeraldc_span::Span;
 
-use crate::{LexerError, Span, WideToken, WideTokenKind};
+use crate::{LexerError, WideToken, WideTokenKind};
 
 /// Лексер.
 ///
@@ -42,7 +43,7 @@ impl<'s> Lexer<'s> {
             TokenKind::IdentifierOrKeyword => {
                 self.identifier_or_keyword_wide_kind(span)
             }
-            TokenKind::Unknown => self.unknown_wide_kind(),
+            TokenKind::Unknown => self.unknown_wide_kind(span.clone()),
             same => self.same_wide_kind(same),
         }
     }
@@ -68,8 +69,8 @@ impl<'s> Lexer<'s> {
         }
     }
 
-    fn unknown_wide_kind(&mut self) -> WideTokenKind {
-        let error = LexerError::UnknownCharacter;
+    fn unknown_wide_kind(&mut self, span: Span) -> WideTokenKind {
+        let error = LexerError::UnknownCharacter(span);
         WideTokenKind::HadError(error)
     }
 
@@ -89,7 +90,6 @@ impl<'s> Lexer<'s> {
         }
     }
 
-    /// Создает спан и обновляет конец токена.
     fn span(&mut self, token_length: usize) -> Span {
         let start = self.previous_token_end;
         let end = start + token_length;

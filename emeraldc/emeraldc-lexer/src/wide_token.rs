@@ -1,5 +1,6 @@
 use crate::LexerError;
 use serde::{Deserialize, Serialize};
+use emeraldc_span::Span;
 
 /// Полный токен.
 ///
@@ -46,23 +47,5 @@ impl WideTokenKind {
             Self::HadError(error) => error,
             _ => panic!(),
         }
-    }
-}
-
-/// Отрезок, который обозначает местонахождение токена.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Span {
-    pub start: usize,
-    pub end: usize,
-}
-
-impl Span {
-    pub fn new(start: usize, end: usize) -> Self {
-        Self { start, end }
-    }
-
-    pub fn join(self, right: Self) -> Self {
-        assert!(self.end < right.start);
-        Self::new(self.start, right.end)
     }
 }

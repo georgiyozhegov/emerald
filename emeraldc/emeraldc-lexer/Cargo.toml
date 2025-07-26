@@ -5,4 +5,5 @@ edition = "2024"
 
 [dependencies]
 emeraldc-tokenizer = { path = "../emeraldc-tokenizer" }
+emeraldc-span = { path = "../emeraldc-span" }
 serde = { version = "1.0.219", features = ["derive"] }
