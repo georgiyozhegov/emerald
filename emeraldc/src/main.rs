@@ -1,6 +1,5 @@
 use emeraldc_lexer::Lexer;
 use emeraldc_parser::Parser;
-use emeraldc_pt_visualizer::Visualizer;
 use emeraldc_tokenizer::Tokenizer;
 
 fn main() {
@@ -10,8 +9,6 @@ fn main() {
     let tokens = Tokenizer::tokenize(source.as_str());
     let tokens = Lexer::lex(source.as_str(), tokens);
     let parse_tree = Parser::parse(tokens);
-    let visualization = Visualizer::visualize(parse_tree, source.as_str());
-    println!("{visualization}");
 
     /*
     let text = std::fs::read_to_string("source.ed").unwrap();
