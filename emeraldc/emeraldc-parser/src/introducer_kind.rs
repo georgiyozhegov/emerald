@@ -1,4 +1,4 @@
-use emeraldc_lexer::WideTokenKind;
+use emeraldc_lexer::WideToken;
 
 /// Kind of a construct introducer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -14,14 +14,14 @@ pub enum IntroducerKind {
     Other,
 }
 
-impl From<&WideTokenKind> for IntroducerKind {
-    fn from(token_kind: &WideTokenKind) -> Self {
+impl From<&WideToken> for IntroducerKind {
+    fn from(token_kind: &WideToken) -> Self {
         match token_kind {
-            WideTokenKind::FunctionKeyword => Self::Declaration,
-            WideTokenKind::LetKeyword => Self::Statement,
-            WideTokenKind::Identifier
-            | WideTokenKind::Integer
-            | WideTokenKind::OpenRound => Self::Expression,
+            WideToken::FunctionKeyword => Self::Declaration,
+            WideToken::LetKeyword => Self::Statement,
+            WideToken::Identifier
+            | WideToken::Integer
+            | WideToken::OpenRound => Self::Expression,
             _ => Self::Other,
         }
     }

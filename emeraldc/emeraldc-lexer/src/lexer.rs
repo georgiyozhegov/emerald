@@ -1,7 +1,7 @@
 use emeraldc_tokenizer::{Token, TokenKind};
-use emeraldc_span::Span;
+use emeraldc_span::{Span, Spanned, IntoSpanned};
 
-use crate::{LexerError, WideToken, WideTokenKind};
+use crate::{LexerError, WideToken};
 
 /// Лексер.
 ///
@@ -15,7 +15,7 @@ impl<'s> Lexer<'s> {
     pub fn lex(
         source: &'s str,
         token_stream: impl Iterator<Item = Token>,
-    ) -> impl Iterator<Item = WideToken> {
+    ) -> impl Iterator<Item = Spanned<WideToken>> {
         let mut lexer = Self::new(source);
         token_stream.map(move |token| lexer.wide_token(token))
     }
@@ -28,22 +28,22 @@ impl<'s> Lexer<'s> {
     }
 
     /// Создает полный токен из исходного.
-    fn wide_token(&mut self, thin_token: Token) -> WideToken {
+    fn wide_token(&mut self, thin_token: Token) -> Spanned<WideToken> {
         let span = self.span(thin_token.length);
-        let kind = self.wide_kind(thin_token.kind, &span);
-        WideToken::new(kind, span)
+        let token = self.wide_kind(thin_token.kind, &span);
+        token.into_spanned(span)
     }
 
     fn wide_kind(
         &mut self,
         thin_kind: TokenKind,
         span: &Span,
-    ) -> WideTokenKind {
+    ) -> WideToken {
         match thin_kind {
             TokenKind::IdentifierOrKeyword => {
                 self.identifier_or_keyword_wide_kind(span)
             }
-            TokenKind::Unknown => self.unknown_wide_kind(span.clone()),
+            TokenKind::Unknown => self.unknown_wide_kind(),
             same => self.same_wide_kind(same),
         }
     }
@@ -51,41 +51,41 @@ impl<'s> Lexer<'s> {
     fn identifier_or_keyword_wide_kind(
         &mut self,
         span: &Span,
-    ) -> WideTokenKind {
+    ) -> WideToken {
         let lexeme: &str = &self.source[span.start..span.end];
-        if let Some(keyword_kind) = self.maybe_keyword(lexeme) {
-            keyword_kind
+        if let Some(keyword) = self.maybe_keyword(lexeme) {
+            keyword
         } else {
-            WideTokenKind::Identifier
+            WideToken::Identifier
         }
     }
 
-    fn maybe_keyword(&self, lexeme: &str) -> Option<WideTokenKind> {
+    fn maybe_keyword(&self, lexeme: &str) -> Option<WideToken> {
         match lexeme {
-            "function" => Some(WideTokenKind::FunctionKeyword),
-            "end" => Some(WideTokenKind::EndKeyword),
-            "let" => Some(WideTokenKind::LetKeyword),
+            "function" => Some(WideToken::FunctionKeyword),
+            "end" => Some(WideToken::EndKeyword),
+            "let" => Some(WideToken::LetKeyword),
             _ => None,
         }
     }
 
-    fn unknown_wide_kind(&mut self, span: Span) -> WideTokenKind {
-        let error = LexerError::UnknownCharacter(span);
-        WideTokenKind::HadError(error)
+    fn unknown_wide_kind(&mut self) -> WideToken {
+        let error = LexerError::UnknownCharacter;
+        WideToken::HadError(error)
     }
 
     /// Конвертирует типы, которые одинаковы и в токенизаторе, и в лексере.
-    fn same_wide_kind(&self, thin_kind: TokenKind) -> WideTokenKind {
+    fn same_wide_kind(&self, thin_kind: TokenKind) -> WideToken {
         match thin_kind {
-            TokenKind::Integer => WideTokenKind::Integer,
-            TokenKind::OpenRound => WideTokenKind::OpenRound,
-            TokenKind::CloseRound => WideTokenKind::CloseRound,
-            TokenKind::Equal => WideTokenKind::Equal,
-            TokenKind::Plus => WideTokenKind::Plus,
-            TokenKind::Minus => WideTokenKind::Minus,
-            TokenKind::Asterisk => WideTokenKind::Asterisk,
-            TokenKind::Slash => WideTokenKind::Slash,
-            TokenKind::Invisible => WideTokenKind::Invisible,
+            TokenKind::Integer => WideToken::Integer,
+            TokenKind::OpenRound => WideToken::OpenRound,
+            TokenKind::CloseRound => WideToken::CloseRound,
+            TokenKind::Equal => WideToken::Equal,
+            TokenKind::Plus => WideToken::Plus,
+            TokenKind::Minus => WideToken::Minus,
+            TokenKind::Asterisk => WideToken::Asterisk,
+            TokenKind::Slash => WideToken::Slash,
+            TokenKind::Invisible => WideToken::Invisible,
             _ => unreachable!(),
         }
     }

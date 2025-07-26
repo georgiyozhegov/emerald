@@ -1,5 +1,5 @@
-use emeraldc_lexer::WideTokenKind;
-use emeraldc_span::Span;
+use emeraldc_lexer::WideToken;
+use emeraldc_span::{Span, Spanned};
 use serde::{Deserialize, Serialize};
 
 use crate::NodeError;
@@ -11,12 +11,12 @@ pub enum Declaration {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Function {
-    pub _introducer: ParsedNode<WideTokenKind>,
-    pub identifier: ParsedNode<Identifier>,
-    pub _open_round: ParsedNode<WideTokenKind>,
-    pub _close_round: ParsedNode<WideTokenKind>,
-    pub body: Vec<ParsedNode<Statement>>,
-    pub _end: ParsedNode<WideTokenKind>,
+    pub _introducer: Parsed<WideToken>,
+    pub identifier: Parsed<Identifier>,
+    pub _open_round: Parsed<WideToken>,
+    pub _close_round: Parsed<WideToken>,
+    pub body: Vec<Parsed<Statement>>,
+    pub _end: Parsed<WideToken>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -29,10 +29,10 @@ pub enum Statement {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Let {
-    pub _introducer: ParsedNode<WideTokenKind>,
-    pub identifier: ParsedNode<Identifier>,
-    pub _equal: ParsedNode<WideTokenKind>,
-    pub value: ParsedNode<Expression>,
+    pub _introducer: Parsed<WideToken>,
+    pub identifier: Parsed<Identifier>,
+    pub _equal: Parsed<WideToken>,
+    pub value: Parsed<Expression>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -45,16 +45,16 @@ pub enum Expression {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Binary {
-    pub left: Box<ParsedNode<Expression>>,
-    pub operator: ParsedNode<BinaryOperator>,
-    pub right: Box<ParsedNode<Expression>>,
+    pub left: Box<Parsed<Expression>>,
+    pub operator: Parsed<BinaryOperator>,
+    pub right: Box<Parsed<Expression>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Parenthesized {
-    pub _open_round: ParsedNode<WideTokenKind>,
-    pub inner: Box<ParsedNode<Expression>>,
-    pub _close_round: ParsedNode<WideTokenKind>,
+    pub _open_round: Parsed<WideToken>,
+    pub inner: Box<Parsed<Expression>>,
+    pub _close_round: Parsed<WideToken>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -66,12 +66,12 @@ pub enum BinaryOperator {
 }
 
 impl BinaryOperator {
-    pub fn from_token(kind: &WideTokenKind) -> Option<Self> {
+    pub fn from_token(kind: &WideToken) -> Option<Self> {
         match kind {
-            WideTokenKind::Plus => Some(Self::Add),
-            WideTokenKind::Minus => Some(Self::Subtract),
-            WideTokenKind::Asterisk => Some(Self::Multiply),
-            WideTokenKind::Slash => Some(Self::Divide),
+            WideToken::Plus => Some(Self::Add),
+            WideToken::Minus => Some(Self::Subtract),
+            WideToken::Asterisk => Some(Self::Multiply),
+            WideToken::Slash => Some(Self::Divide),
             _ => None,
         }
     }
@@ -84,14 +84,11 @@ impl BinaryOperator {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ParsedNode<T> {
-    pub node: Result<T, NodeError>,
-    pub span: Span,
-}
+pub type Parsed<T> = Result<Spanned<T>, Spanned<NodeError>>;
 
-impl<T> ParsedNode<T> {
-    pub fn new(node: Result<T, NodeError>, span: Span) -> Self {
-        Self { node, span }
+pub fn span_from_parsed<T>(parsed: &Parsed<T>) -> Span {
+    match parsed {
+        Ok(spanned) => spanned.span.clone(),
+        Err(spanned) => spanned.span.clone(),
     }
 }

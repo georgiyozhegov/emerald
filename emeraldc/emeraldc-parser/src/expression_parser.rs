@@ -1,10 +1,8 @@
-use emeraldc_lexer::WideTokenKind;
-
-// i'm proud of this parser
+use emeraldc_lexer::WideToken;
+use emeraldc_span::{IntoSpanned, Span};
 
 use crate::{
-    Binary, BinaryOperator, Expression, FatalParserError, IntroducerKind,
-    NodeError, Parenthesized, ParsedNode, Parser, Subparser,
+    span_from_parsed, Binary, BinaryOperator, Expression, FatalParserError, IntroducerKind, NodeError, Parenthesized, Parsed, Parser, Subparser
 };
 
 pub struct ExpressionParser<'p> {
@@ -14,7 +12,7 @@ pub struct ExpressionParser<'p> {
 impl<'p> Subparser<'p, Expression> for ExpressionParser<'p> {
     fn parse(
         parser: &'p mut Parser,
-    ) -> Result<ParsedNode<Expression>, FatalParserError> {
+    ) -> Result<Parsed<Expression>, FatalParserError> {
         let this = Self::new(parser);
         this.parse()
     }
@@ -25,14 +23,14 @@ impl<'p> ExpressionParser<'p> {
         Self { parser }
     }
 
-    fn parse(mut self) -> Result<ParsedNode<Expression>, FatalParserError> {
+    fn parse(mut self) -> Result<Parsed<Expression>, FatalParserError> {
         self.parse_with_precedence(0)
     }
 
     fn parse_with_precedence(
         &mut self,
         minimal_precedence: u8,
-    ) -> Result<ParsedNode<Expression>, FatalParserError> {
+    ) -> Result<Parsed<Expression>, FatalParserError> {
         let mut left = self.parse_primary()?;
         while let Some(operator) = self.peek_binary_operator() {
             let (left_precedence, right_precedence) = operator.precedence();
@@ -41,34 +39,41 @@ impl<'p> ExpressionParser<'p> {
             }
             let operator = self.parse_binary_operator(operator)?;
             let right = self.parse_with_precedence(right_precedence)?;
-            let span = left.span.clone().join(right.span.clone());
+            let span = self.join_binary_span(&left, &right);
             let binary = Binary {
                 left: Box::new(left),
                 operator,
                 right: Box::new(right),
             };
-            let node = Ok(Expression::Binary(binary));
-            left = ParsedNode::new(node, span);
+            let parsed = Ok(Expression::Binary(binary).into_spanned(span));
+            left = parsed;
         }
         Ok(left)
     }
 
+    fn join_binary_span(&self, left: &Parsed<Expression>, right: &Parsed<Expression>) -> Span {
+        let left = span_from_parsed(left);
+        let right = span_from_parsed(right);
+        left.join(right)
+    }
+
     fn peek_binary_operator(&mut self) -> Option<BinaryOperator> {
         let token = self.parser.tokens.peek();
-        token.and_then(|t| BinaryOperator::from_token(&t.kind))
+        token.and_then(|t| BinaryOperator::from_token(&t.value))
     }
 
     fn parse_binary_operator(
         &mut self,
         peeked_operator: BinaryOperator,
-    ) -> Result<ParsedNode<BinaryOperator>, FatalParserError> {
+    ) -> Result<Parsed<BinaryOperator>, FatalParserError> {
         let token = self.parser.tokens.next().unwrap();
-        Ok(ParsedNode::new(Ok(peeked_operator), token.span))
+        let parsed = Ok(peeked_operator.into_spanned(token.span));
+        Ok(parsed)
     }
 
     fn parse_primary(
         &mut self,
-    ) -> Result<ParsedNode<Expression>, FatalParserError> {
+    ) -> Result<Parsed<Expression>, FatalParserError> {
         match self.parser.token_introducer_kind() {
             IntroducerKind::Expression => self.parse_primary_unchecked(),
             _ => self.invalid_primary(),
@@ -77,16 +82,16 @@ impl<'p> ExpressionParser<'p> {
 
     fn invalid_primary(
         &mut self,
-    ) -> Result<ParsedNode<Expression>, FatalParserError> {
+    ) -> Result<Parsed<Expression>, FatalParserError> {
         match self.parser.tokens.next() {
-            Some(token) if token.kind.had_error() => {
-                let error = Err(NodeError::Lexer(token.kind.as_error()));
-                Ok(ParsedNode::new(error, token.span))
+            Some(token) if token.value.had_error() => {
+                let error = Err(NodeError::Lexer(token.value.as_error()).into_spanned(token.span));
+                Ok(error)
             }
             Some(token) => {
                 let error =
-                    Err(NodeError::InvalidExpressionIntroducer(token.kind));
-                Ok(ParsedNode::new(error, token.span))
+                    Err(NodeError::InvalidExpressionIntroducer(token.value).into_spanned(token.span));
+                Ok(error)
             }
             None => Err(FatalParserError::UnexpectedEof),
         }
@@ -94,20 +99,20 @@ impl<'p> ExpressionParser<'p> {
 
     fn parse_primary_unchecked(
         &mut self,
-    ) -> Result<ParsedNode<Expression>, FatalParserError> {
+    ) -> Result<Parsed<Expression>, FatalParserError> {
         match self.parser.tokens.peek() {
-            Some(token) if token.kind == WideTokenKind::Integer => {
+            Some(token) if token.value == WideToken::Integer => {
                 let token = self.parser.tokens.next().unwrap();
-                let node = Ok(Expression::Integer);
-                Ok(ParsedNode::new(node, token.span))
+                let parsed = Ok(Expression::Integer.into_spanned(token.span));
+                Ok(parsed)
             }
-            Some(token) if token.kind == WideTokenKind::Identifier => {
+            Some(token) if token.value == WideToken::Identifier => {
                 let identifier = self.parser.parse_identifier()?;
-                let node =
-                    identifier.node.and_then(|n| Ok(Expression::Variable(n)));
-                Ok(ParsedNode::new(node, identifier.span))
+                let parsed =
+                    identifier.and_then(|n| Ok(Expression::Variable(n.value).into_spanned(n.span)));
+                Ok(parsed)
             }
-            Some(token) if token.kind == WideTokenKind::OpenRound => {
+            Some(token) if token.value == WideToken::OpenRound => {
                 self.parse_parenthesized()
             }
             _ => Err(FatalParserError::CompilerBug("unreachable variant")),
@@ -116,17 +121,17 @@ impl<'p> ExpressionParser<'p> {
 
     fn parse_parenthesized(
         &mut self,
-    ) -> Result<ParsedNode<Expression>, FatalParserError> {
-        let _open_round = self.parser.expect(WideTokenKind::OpenRound)?;
+    ) -> Result<Parsed<Expression>, FatalParserError> {
+        let _open_round = self.parser.expect(WideToken::OpenRound)?;
         let inner = self.parser.parse_expression()?;
-        let _close_round = self.parser.expect(WideTokenKind::CloseRound)?;
-        let span = _open_round.span.clone().join(_close_round.span.clone());
+        let _close_round = self.parser.expect(WideToken::CloseRound)?;
+        let span = span_from_parsed(&_open_round).join(span_from_parsed(&_close_round));
         let parenthesized = Parenthesized {
             _open_round,
             inner: Box::new(inner),
             _close_round,
         };
-        let node = Ok(Expression::Parenthesized(parenthesized));
-        Ok(ParsedNode::new(node, span))
+        let parsed = Ok(Expression::Parenthesized(parenthesized).into_spanned(span));
+        Ok(parsed)
     }
 }

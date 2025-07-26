@@ -9,6 +9,8 @@ fn main() {
     let tokens = Tokenizer::tokenize(source.as_str());
     let tokens = Lexer::lex(source.as_str(), tokens);
     let parse_tree = Parser::parse(tokens);
+    let parse_tree: Vec<_> = parse_tree.collect();
+    println!("{}", serde_json::to_string_pretty(&parse_tree).unwrap());
 
     /*
     let text = std::fs::read_to_string("source.ed").unwrap();

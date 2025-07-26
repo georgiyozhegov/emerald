@@ -1,25 +1,8 @@
 use crate::LexerError;
 use serde::{Deserialize, Serialize};
-use emeraldc_span::Span;
 
-/// Полный токен.
-///
-/// Содержит полный тип токена и его местонахождение.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct WideToken {
-    pub kind: WideTokenKind,
-    pub span: Span,
-}
-
-impl WideToken {
-    pub fn new(kind: WideTokenKind, span: Span) -> Self {
-        Self { kind, span }
-    }
-}
-
-/// Тип полного токена.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub enum WideTokenKind {
+pub enum WideToken {
     Identifier,
     FunctionKeyword,
     EndKeyword,
@@ -37,7 +20,7 @@ pub enum WideTokenKind {
     HadError(LexerError),
 }
 
-impl WideTokenKind {
+impl WideToken {
     pub fn had_error(&self) -> bool {
         matches!(self, Self::HadError(_))
     }

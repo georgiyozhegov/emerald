@@ -1,10 +1,8 @@
-use emeraldc_lexer::WideTokenKind;
-
-// i'm proud of this parser
+use emeraldc_lexer::WideToken;
+use emeraldc_span::IntoSpanned;
 
 use crate::{
-    Declaration, FatalParserError, Function, IntroducerKind, ParsedNode,
-    Parser, Statement, Subparser,
+    span_from_parsed, Declaration, FatalParserError, Function, IntroducerKind, Parsed, Parser, Statement, Subparser
 };
 
 pub struct DeclarationParser<'p> {
@@ -14,7 +12,7 @@ pub struct DeclarationParser<'p> {
 impl<'p> Subparser<'p, Declaration> for DeclarationParser<'p> {
     fn parse(
         parser: &'p mut Parser,
-    ) -> Result<ParsedNode<Declaration>, FatalParserError> {
+    ) -> Result<Parsed<Declaration>, FatalParserError> {
         let this = Self::new(parser);
         this.parse()
     }
@@ -25,7 +23,7 @@ impl<'p> DeclarationParser<'p> {
         Self { parser }
     }
 
-    fn parse(mut self) -> Result<ParsedNode<Declaration>, FatalParserError> {
+    fn parse(mut self) -> Result<Parsed<Declaration>, FatalParserError> {
         match self.parser.token_introducer_kind() {
             IntroducerKind::Declaration => self.parse_unchecked(),
             _ => self.invalid_introducer(),
@@ -34,29 +32,29 @@ impl<'p> DeclarationParser<'p> {
 
     fn invalid_introducer<T>(&mut self) -> Result<T, FatalParserError> {
         let token = self.parser.tokens.next().unwrap();
-        Err(FatalParserError::InvalidDeclarationIntroducer(token.kind))
+        Err(FatalParserError::InvalidDeclarationIntroducer(token.value))
     }
 
     fn parse_unchecked(
         self,
-    ) -> Result<ParsedNode<Declaration>, FatalParserError> {
-        match self.parser.tokens.peek().unwrap().kind {
-            WideTokenKind::FunctionKeyword => self.parse_function(),
+    ) -> Result<Parsed<Declaration>, FatalParserError> {
+        match self.parser.tokens.peek().unwrap().value {
+            WideToken::FunctionKeyword => self.parse_function(),
             _ => Err(FatalParserError::CompilerBug("unreachable variant")),
         }
     }
 
     fn parse_function(
         mut self,
-    ) -> Result<ParsedNode<Declaration>, FatalParserError> {
-        let _introducer = self.parser.expect(WideTokenKind::FunctionKeyword)?;
-        let introducer_span = _introducer.span.clone();
+    ) -> Result<Parsed<Declaration>, FatalParserError> {
+        let _introducer = self.parser.expect(WideToken::FunctionKeyword)?;
+        let introducer_span = span_from_parsed(&_introducer);
         let identifier = self.parser.parse_identifier()?;
-        let _open_round = self.parser.expect(WideTokenKind::OpenRound)?;
-        let _close_round = self.parser.expect(WideTokenKind::CloseRound)?;
+        let _open_round = self.parser.expect(WideToken::OpenRound)?;
+        let _close_round = self.parser.expect(WideToken::CloseRound)?;
         let body = self.parse_function_body()?;
-        let _end = self.parser.expect(WideTokenKind::EndKeyword)?;
-        let end_span = _end.span.clone();
+        let _end = self.parser.expect(WideToken::EndKeyword)?;
+        let end_span = span_from_parsed(&_end);
         let function = Function {
             _introducer,
             identifier,
@@ -65,14 +63,14 @@ impl<'p> DeclarationParser<'p> {
             body,
             _end,
         };
-        let node = Ok(Declaration::Function(function));
         let span = introducer_span.join(end_span);
-        Ok(ParsedNode::new(node, span))
+        let parsed = Ok(Declaration::Function(function).into_spanned(span));
+        Ok(parsed)
     }
 
     fn parse_function_body(
         &mut self,
-    ) -> Result<Vec<ParsedNode<Statement>>, FatalParserError> {
+    ) -> Result<Vec<Parsed<Statement>>, FatalParserError> {
         let mut body = Vec::new();
         while !self.is_function_body_end() {
             let statement = self.parser.parse_statement()?;
@@ -85,6 +83,6 @@ impl<'p> DeclarationParser<'p> {
         self.parser
             .tokens
             .peek()
-            .is_some_and(|t| t.kind == WideTokenKind::EndKeyword)
+            .is_some_and(|t| t.value == WideToken::EndKeyword)
     }
 }
