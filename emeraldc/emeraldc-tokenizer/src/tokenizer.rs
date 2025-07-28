@@ -37,7 +37,8 @@ impl<'s> Tokenizer<'s> {
         match group {
             ChGroup::Alphabetic => self.identifier_or_keyword_token(),
             ChGroup::Numeric => self.integer_token(),
-            ChGroup::Invisible => self.invisible_token(),
+            ChGroup::Invisible { .. } => self.invisible_token(),
+            ChGroup::Comment => self.comment(),
             ChGroup::MaybePunctuation => self.punctuation_or_unknown_token(),
         }
     }
@@ -57,10 +58,15 @@ impl<'s> Tokenizer<'s> {
 
     fn invisible_token(&mut self) -> Token {
         self.long_token_with_tracked_length(TokenKind::Invisible, |cg| {
-            matches!(cg, ChGroup::Invisible)
+            matches!(cg, ChGroup::Invisible { .. })
         })
     }
 
+    fn comment(&mut self) -> Token {
+        self.long_token_with_tracked_length(TokenKind::Comment, |cg| {
+            !matches!(cg, ChGroup::Invisible { newline: true })
+        })
+    }
     /// Создаёт токен, включая в него длину.
     fn long_token_with_tracked_length(
         &mut self,

@@ -34,5 +34,6 @@ pub enum TokenKind {
     Asterisk,
     Slash,
     Invisible,
+    Comment,
     Unknown,
 }

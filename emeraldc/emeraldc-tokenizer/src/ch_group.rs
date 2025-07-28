@@ -5,7 +5,10 @@ pub enum ChGroup {
     /// Символы чисел.
     Numeric,
     /// Символы невидимых символов, например, пробел и таб.
-    Invisible,
+    Invisible {
+        newline: bool,
+    },
+    Comment,
     /// Другие символы, которые могут быть пунктуацией.
     MaybePunctuation,
 }
@@ -15,7 +18,9 @@ impl From<char> for ChGroup {
         match ch {
             'a'..='z' | 'A'..='Z' | '_' => Self::Alphabetic,
             '0'..='9' => Self::Numeric,
-            ' ' | '\t' | '\n' => Self::Invisible,
+            ' ' | '\t' => Self::Invisible { newline: false },
+            '\n' => Self::Invisible { newline: true },
+            '#' => Self::Comment,
             _ => Self::MaybePunctuation,
         }
     }
