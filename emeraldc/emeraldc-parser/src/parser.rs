@@ -26,7 +26,9 @@ impl Parser {
     }
 
     fn new(tokens: impl Iterator<Item = Spanned<WideToken>>) -> Self {
-        let tokens = tokens.filter(|t| t.value != WideToken::Invisible);
+        let tokens = tokens.filter(|t| {
+            !matches!(t.value, WideToken::Invisible | WideToken::Comment)
+        });
         let tokens = tokens.collect::<Vec<_>>().into_iter();
         let tokens = tokens.peekable();
         Self { tokens }

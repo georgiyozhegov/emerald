@@ -79,6 +79,7 @@ impl<'s> Lexer<'s> {
             TokenKind::Asterisk => WideToken::Asterisk,
             TokenKind::Slash => WideToken::Slash,
             TokenKind::Invisible => WideToken::Invisible,
+            TokenKind::Comment => WideToken::Comment,
             _ => unreachable!(),
         }
     }

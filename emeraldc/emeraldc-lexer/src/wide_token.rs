@@ -16,6 +16,7 @@ pub enum WideToken {
     Asterisk,
     Slash,
     Invisible,
+    Comment,
     /// Содержит случившуюся ошибку.
     HadError(LexerError),
 }
