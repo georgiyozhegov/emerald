@@ -169,7 +169,7 @@ impl std::fmt::Display for Report {
 }
 
 impl Report {
-    pub fn preview(&self, source: &str) -> String {
+    pub fn preview(&self, source: &str) {
         match self {
             Self::Node(spanned_error) => {
                 let span = &spanned_error.span;
@@ -181,7 +181,12 @@ impl Report {
                     .find('\n')
                     .map(|i| span.end + i)
                     .unwrap_or_else(|| source.len());
-                source[start..end].to_string()
+                let pointer_start = span.start - start;
+                let pointer_length = span.end - span.start;
+                let pointer_line = " ".repeat(pointer_start) + "\x1b[33m" + &"^".repeat(pointer_length) + " here\x1b[m";
+                eprintln!("\x1b[31m|\x1b[m");
+                eprintln!("\x1b[31m|\x1b[m {}", source[start..end].to_string());
+                eprintln!("\x1b[31m|\x1b[m {pointer_line}");
             }
             _ => unimplemented!(),
         }
