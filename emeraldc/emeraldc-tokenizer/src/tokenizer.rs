@@ -93,7 +93,7 @@ impl<'s> Tokenizer<'s> {
             '-' => TokenKind::Minus,
             '*' => TokenKind::Asterisk,
             '/' => TokenKind::Slash,
-            _ => TokenKind::Unknown,
+            c => TokenKind::Unknown(c),
         }
     }
 }

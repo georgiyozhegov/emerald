@@ -44,13 +44,13 @@ impl std::fmt::Display for NodeError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::UnexpectedToken(token) => {
-                write!(f, "unexpected token: {token:?}")
+                write!(f, "unexpected token: {token}")
             }
             Self::InvalidStatementIntroducer(token) => {
-                write!(f, "invalid statement introducer: {token:?}")
+                write!(f, "invalid statement introducer: {token}")
             }
             Self::InvalidExpressionIntroducer(token) => {
-                write!(f, "invalid expression introducer: {token:?}")
+                write!(f, "invalid expression introducer: {token}")
             }
             Self::Lexer(error) => write!(f, "{error}"),
         }

@@ -39,7 +39,7 @@ impl<'s> Lexer<'s> {
             TokenKind::IdentifierOrKeyword => {
                 self.identifier_or_keyword_wide_kind(span)
             }
-            TokenKind::Unknown => self.unknown_wide_kind(),
+            TokenKind::Unknown(ch) => self.unknown_wide_kind(ch),
             same => self.same_wide_kind(same),
         }
     }
@@ -62,8 +62,8 @@ impl<'s> Lexer<'s> {
         }
     }
 
-    fn unknown_wide_kind(&mut self) -> WideToken {
-        let error = LexerError::UnknownCharacter;
+    fn unknown_wide_kind(&mut self, ch: char) -> WideToken {
+        let error = LexerError::UnknownCharacter(ch);
         WideToken::HadError(error)
     }
 

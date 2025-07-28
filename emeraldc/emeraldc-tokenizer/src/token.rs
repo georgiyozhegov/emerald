@@ -35,5 +35,5 @@ pub enum TokenKind {
     Slash,
     Invisible,
     Comment,
-    Unknown,
+    Unknown(char),
 }

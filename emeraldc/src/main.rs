@@ -1,29 +1,31 @@
 use emeraldc_lexer::Lexer;
-use emeraldc_parser::Parser;
+use emeraldc_parser::{Declaration, FatalParserError, Parsed, Parser};
 use emeraldc_tokenizer::Tokenizer;
+use emeraldc_tree_checker::{Report, TreeChecker};
+
+fn parse_tree(
+    source: &str,
+) -> impl Iterator<Item = Result<Parsed<Declaration>, FatalParserError>> {
+    let thin_tokens = Tokenizer::tokenize(source);
+    let tokens = Lexer::lex(source, thin_tokens);
+    let parse_tree = Parser::parse(tokens);
+    parse_tree
+}
 
 fn main() {
     env_logger::init();
 
     let source = std::fs::read_to_string("source.ed").unwrap();
-    let tokens = Tokenizer::tokenize(source.as_str());
-    let tokens = Lexer::lex(source.as_str(), tokens);
-    let parse_tree = Parser::parse(tokens);
-    let parse_tree: Vec<_> = parse_tree.collect();
-    println!("{}", serde_json::to_string_pretty(&parse_tree).unwrap());
-
-    /*
-    let text = std::fs::read_to_string("source.ed").unwrap();
-    let sb = emeraldc_lexer::SourceBuffer::new(text);
-    let tokens = emeraldc_lexer::Lexer::new(sb).lex(&mut reporter);
-    let tokens_iter = tokens.into_iter().peekable();
-    */
-
-    /*
-    let source = ParserSource::new(tokens_iter);
-    let pt = emeraldc_parser::Parser::new(source).parse();
-    for declaration in pt.program.iter() {
-        println!("{declaration:?}");
+    let pt = parse_tree(&source);
+    let rp = TreeChecker::check(pt);
+    for report in rp {
+        eprintln!("{report}");
+        match report {
+            Report::Node(_) => {
+                eprintln!("{}", report.preview(&source));
+                eprintln!();
+            }
+            _ => {},
+        }
     }
-    */
 }

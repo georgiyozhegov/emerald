@@ -65,6 +65,7 @@ dependencies = [
  "emeraldc-lexer",
  "emeraldc-parser",
  "emeraldc-tokenizer",
+ "emeraldc-tree-checker",
  "env_logger",
  "log",
  "serde_json",
@@ -99,6 +100,15 @@ dependencies = [
 [[package]]
 name = "emeraldc-tokenizer"
 version = "0.1.0"
+
+[[package]]
+name = "emeraldc-tree-checker"
+version = "0.1.0"
+dependencies = [
+ "emeraldc-lexer",
+ "emeraldc-parser",
+ "emeraldc-span",
+]
 
 [[package]]
 name = "env_filter"
