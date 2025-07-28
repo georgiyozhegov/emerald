@@ -22,7 +22,9 @@ fn main() {
         eprintln!("{report}");
         match report {
             Report::Node(_) => {
-                eprintln!("{}", report.preview(&source));
+                eprintln!("\x1b[31m|\x1b[m");
+                eprintln!("\x1b[31m|\x1b[m {}", report.preview(&source));
+                eprintln!("\x1b[31m|\x1b[m");
                 eprintln!();
             }
             _ => {},
