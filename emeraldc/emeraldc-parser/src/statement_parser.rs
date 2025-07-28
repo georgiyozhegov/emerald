@@ -2,7 +2,8 @@ use emeraldc_lexer::WideToken;
 use emeraldc_span::IntoSpanned;
 
 use crate::{
-    span_from_parsed, FatalParserError, IntroducerKind, Let, NodeError, Parsed, Parser, Statement, Subparser
+    FatalParserError, IntroducerKind, Let, NodeError, Parsed, Parser,
+    Statement, Subparser, span_from_parsed,
 };
 
 pub struct StatementParser<'p> {
@@ -35,21 +36,21 @@ impl<'p> StatementParser<'p> {
     ) -> Result<Parsed<Statement>, FatalParserError> {
         match self.parser.tokens.next() {
             Some(token) if token.value.had_error() => {
-                let error = Err(NodeError::Lexer(token.value.as_error()).into_spanned(token.span));
+                let error = Err(NodeError::Lexer(token.value.as_error())
+                    .into_spanned(token.span));
                 Ok(error)
             }
             Some(token) => {
                 let error =
-                    Err(NodeError::InvalidStatementIntroducer(token.value).into_spanned(token.span));
+                    Err(NodeError::InvalidStatementIntroducer(token.value)
+                        .into_spanned(token.span));
                 Ok(error)
             }
             None => Err(FatalParserError::UnexpectedEof),
         }
     }
 
-    fn parse_unchecked(
-        self,
-    ) -> Result<Parsed<Statement>, FatalParserError> {
+    fn parse_unchecked(self) -> Result<Parsed<Statement>, FatalParserError> {
         match self.parser.tokens.peek().unwrap().value {
             WideToken::LetKeyword => self.parse_let(),
             _ => Err(FatalParserError::CompilerBug("unreachable variant")),

@@ -1,5 +1,5 @@
+use emeraldc_span::{IntoSpanned, Span, Spanned};
 use emeraldc_tokenizer::{Token, TokenKind};
-use emeraldc_span::{Span, Spanned, IntoSpanned};
 
 use crate::{LexerError, WideToken};
 
@@ -34,11 +34,7 @@ impl<'s> Lexer<'s> {
         token.into_spanned(span)
     }
 
-    fn wide_kind(
-        &mut self,
-        thin_kind: TokenKind,
-        span: &Span,
-    ) -> WideToken {
+    fn wide_kind(&mut self, thin_kind: TokenKind, span: &Span) -> WideToken {
         match thin_kind {
             TokenKind::IdentifierOrKeyword => {
                 self.identifier_or_keyword_wide_kind(span)
@@ -48,10 +44,7 @@ impl<'s> Lexer<'s> {
         }
     }
 
-    fn identifier_or_keyword_wide_kind(
-        &mut self,
-        span: &Span,
-    ) -> WideToken {
+    fn identifier_or_keyword_wide_kind(&mut self, span: &Span) -> WideToken {
         let lexeme: &str = &self.source[span.start..span.end];
         if let Some(keyword) = self.maybe_keyword(lexeme) {
             keyword

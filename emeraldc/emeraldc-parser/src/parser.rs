@@ -4,7 +4,9 @@ use emeraldc_lexer::WideToken;
 use emeraldc_span::{IntoSpanned, Spanned};
 
 use crate::{
-    Declaration, DeclarationParser, Expression, ExpressionParser, FatalParserError, Identifier, IntroducerKind, NodeError, Parsed, Statement, StatementParser
+    Declaration, DeclarationParser, Expression, ExpressionParser,
+    FatalParserError, Identifier, IntroducerKind, NodeError, Parsed, Statement,
+    StatementParser,
 };
 
 pub struct Parser {
@@ -64,11 +66,13 @@ impl Parser {
                 Ok(parsed)
             }
             Some(token) if token.value.had_error() => {
-                let error = Err(NodeError::Lexer(token.value.as_error()).into_spanned(token.span));
+                let error = Err(NodeError::Lexer(token.value.as_error())
+                    .into_spanned(token.span));
                 Ok(error)
             }
             Some(token) => {
-                let error = Err(NodeError::UnexpectedToken(token.value).into_spanned(token.span));
+                let error = Err(NodeError::UnexpectedToken(token.value)
+                    .into_spanned(token.span));
                 Ok(error)
             }
             None => Err(FatalParserError::UnexpectedEof),
@@ -85,11 +89,13 @@ impl Parser {
                 Ok(parsed)
             }
             Some(token) if token.value.had_error() => {
-                let error = Err(NodeError::Lexer(token.value.as_error()).into_spanned(token.span));
+                let error = Err(NodeError::Lexer(token.value.as_error())
+                    .into_spanned(token.span));
                 Ok(error)
             }
             Some(token) => {
-                let error = Err(NodeError::UnexpectedToken(token.value).into_spanned(token.span));
+                let error = Err(NodeError::UnexpectedToken(token.value)
+                    .into_spanned(token.span));
                 Ok(error)
             }
             None => Err(FatalParserError::UnexpectedEof),
@@ -98,6 +104,5 @@ impl Parser {
 }
 
 pub trait Subparser<'p, T> {
-    fn parse(parser: &'p mut Parser)
-    -> Result<Parsed<T>, FatalParserError>;
+    fn parse(parser: &'p mut Parser) -> Result<Parsed<T>, FatalParserError>;
 }

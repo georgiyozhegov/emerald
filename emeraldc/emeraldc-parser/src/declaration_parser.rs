@@ -2,7 +2,8 @@ use emeraldc_lexer::WideToken;
 use emeraldc_span::IntoSpanned;
 
 use crate::{
-    span_from_parsed, Declaration, FatalParserError, Function, IntroducerKind, Parsed, Parser, Statement, Subparser
+    Declaration, FatalParserError, Function, IntroducerKind, Parsed, Parser,
+    Statement, Subparser, span_from_parsed,
 };
 
 pub struct DeclarationParser<'p> {
@@ -35,9 +36,7 @@ impl<'p> DeclarationParser<'p> {
         Err(FatalParserError::InvalidDeclarationIntroducer(token.value))
     }
 
-    fn parse_unchecked(
-        self,
-    ) -> Result<Parsed<Declaration>, FatalParserError> {
+    fn parse_unchecked(self) -> Result<Parsed<Declaration>, FatalParserError> {
         match self.parser.tokens.peek().unwrap().value {
             WideToken::FunctionKeyword => self.parse_function(),
             _ => Err(FatalParserError::CompilerBug("unreachable variant")),

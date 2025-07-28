@@ -2,7 +2,8 @@ use emeraldc_lexer::WideToken;
 use emeraldc_span::{IntoSpanned, Span};
 
 use crate::{
-    span_from_parsed, Binary, BinaryOperator, Expression, FatalParserError, IntroducerKind, NodeError, Parenthesized, Parsed, Parser, Subparser
+    Binary, BinaryOperator, Expression, FatalParserError, IntroducerKind,
+    NodeError, Parenthesized, Parsed, Parser, Subparser, span_from_parsed,
 };
 
 pub struct ExpressionParser<'p> {
@@ -51,7 +52,11 @@ impl<'p> ExpressionParser<'p> {
         Ok(left)
     }
 
-    fn join_binary_span(&self, left: &Parsed<Expression>, right: &Parsed<Expression>) -> Span {
+    fn join_binary_span(
+        &self,
+        left: &Parsed<Expression>,
+        right: &Parsed<Expression>,
+    ) -> Span {
         let left = span_from_parsed(left);
         let right = span_from_parsed(right);
         left.join(right)
@@ -85,12 +90,14 @@ impl<'p> ExpressionParser<'p> {
     ) -> Result<Parsed<Expression>, FatalParserError> {
         match self.parser.tokens.next() {
             Some(token) if token.value.had_error() => {
-                let error = Err(NodeError::Lexer(token.value.as_error()).into_spanned(token.span));
+                let error = Err(NodeError::Lexer(token.value.as_error())
+                    .into_spanned(token.span));
                 Ok(error)
             }
             Some(token) => {
                 let error =
-                    Err(NodeError::InvalidExpressionIntroducer(token.value).into_spanned(token.span));
+                    Err(NodeError::InvalidExpressionIntroducer(token.value)
+                        .into_spanned(token.span));
                 Ok(error)
             }
             None => Err(FatalParserError::UnexpectedEof),
@@ -108,8 +115,9 @@ impl<'p> ExpressionParser<'p> {
             }
             Some(token) if token.value == WideToken::Identifier => {
                 let identifier = self.parser.parse_identifier()?;
-                let parsed =
-                    identifier.and_then(|n| Ok(Expression::Variable(n.value).into_spanned(n.span)));
+                let parsed = identifier.and_then(|n| {
+                    Ok(Expression::Variable(n.value).into_spanned(n.span))
+                });
                 Ok(parsed)
             }
             Some(token) if token.value == WideToken::OpenRound => {
@@ -125,13 +133,15 @@ impl<'p> ExpressionParser<'p> {
         let _open_round = self.parser.expect(WideToken::OpenRound)?;
         let inner = self.parser.parse_expression()?;
         let _close_round = self.parser.expect(WideToken::CloseRound)?;
-        let span = span_from_parsed(&_open_round).join(span_from_parsed(&_close_round));
+        let span = span_from_parsed(&_open_round)
+            .join(span_from_parsed(&_close_round));
         let parenthesized = Parenthesized {
             _open_round,
             inner: Box::new(inner),
             _close_round,
         };
-        let parsed = Ok(Expression::Parenthesized(parenthesized).into_spanned(span));
+        let parsed =
+            Ok(Expression::Parenthesized(parenthesized).into_spanned(span));
         Ok(parsed)
     }
 }
