@@ -13,7 +13,7 @@ impl std::fmt::Display for FatalParserError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::InvalidDeclarationIntroducer(token) => {
-                write!(f, "invalid declaration introducer: {token:?}")
+                write!(f, "invalid declaration introducer: {token}")
             }
             Self::CompilerBug(message) => {
                 write!(f, "critical compiler bug: {message}")

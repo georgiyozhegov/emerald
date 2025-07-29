@@ -37,13 +37,24 @@ impl Parser {
     pub(crate) fn parse_declaration(
         &mut self,
     ) -> Result<Parsed<Declaration>, FatalParserError> {
-        DeclarationParser::parse(self)
+        let declaration = DeclarationParser::parse(self);
+        self.synchronize(|this| {
+            this.tokens.peek().is_none() ||
+            this.token_introducer_kind() == IntroducerKind::Declaration
+        });
+        declaration
     }
 
     pub(crate) fn parse_statement(
         &mut self,
     ) -> Result<Parsed<Statement>, FatalParserError> {
-        StatementParser::parse(self)
+        let statement = StatementParser::parse(self);
+        self.synchronize(|this| {
+            this.tokens.peek().is_none() ||
+            this.token_introducer_kind() == IntroducerKind::Statement ||
+            this.tokens.peek().is_some_and(|s| s.value == WideToken::EndKeyword)
+        });
+        statement
     }
 
     pub(crate) fn parse_expression(
@@ -101,6 +112,12 @@ impl Parser {
                 Ok(error)
             }
             None => Err(FatalParserError::UnexpectedEof),
+        }
+    }
+
+    fn synchronize(&mut self, stop: impl Fn(&mut Self) -> bool) {
+        while !stop(self) {
+            self.tokens.next().unwrap();
         }
     }
 }
