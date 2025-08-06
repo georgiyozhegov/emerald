@@ -232,7 +232,11 @@ impl FullReport<'_> {
         (start, end)
     }
 
-    fn pointer_line(&self, span: &Span, start: usize) -> impl std::fmt::Display {
+    fn pointer_line(
+        &self,
+        span: &Span,
+        start: usize,
+    ) -> impl std::fmt::Display {
         let pointer_start = span.start - start;
         let pointer_length = span.end - span.start;
         " ".repeat(pointer_start)

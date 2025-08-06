@@ -39,8 +39,8 @@ impl Parser {
     ) -> Result<Parsed<Declaration>, FatalParserError> {
         let declaration = DeclarationParser::parse(self);
         self.synchronize(|this| {
-            this.tokens.peek().is_none() ||
-            this.token_introducer_kind() == IntroducerKind::Declaration
+            this.tokens.peek().is_none()
+                || this.token_introducer_kind() == IntroducerKind::Declaration
         });
         declaration
     }
@@ -50,9 +50,12 @@ impl Parser {
     ) -> Result<Parsed<Statement>, FatalParserError> {
         let statement = StatementParser::parse(self);
         self.synchronize(|this| {
-            this.tokens.peek().is_none() ||
-            this.token_introducer_kind() == IntroducerKind::Statement ||
-            this.tokens.peek().is_some_and(|s| s.value == WideToken::EndKeyword)
+            this.tokens.peek().is_none()
+                || this.token_introducer_kind() == IntroducerKind::Statement
+                || this
+                    .tokens
+                    .peek()
+                    .is_some_and(|s| s.value == WideToken::EndKeyword)
         });
         statement
     }
