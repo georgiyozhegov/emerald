@@ -1,7 +1,7 @@
 use emeraldc_lexer::Lexer;
 use emeraldc_parser::{Declaration, FatalParserError, Parsed, Parser};
 use emeraldc_tokenizer::Tokenizer;
-use emeraldc_tree_checker::{Report, TreeChecker};
+use emeraldc_tree_checker::{ErrorUnroller, Report};
 
 fn parse_tree(
     source: &str,
@@ -17,15 +17,8 @@ fn main() {
 
     let source = std::fs::read_to_string("source.ed").unwrap();
     let pt = parse_tree(&source);
-    let rp = TreeChecker::check(pt);
-    for report in rp {
+    for report in ErrorUnroller::unroll(pt) {
+        let report = report.with_preview(&source);
         eprintln!("{report}");
-        match report {
-            Report::Node(_) => {
-                report.preview(&source);
-                eprintln!();
-            }
-            _ => {},
-        }
     }
 }
